@@ -1,0 +1,7 @@
+CREATE TABLE IF NOT EXISTS loans (
+  id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  user_id BIGINT NOT NULL REFERENCES users(id),
+  book_id BIGINT NOT NULL REFERENCES books(id),
+  return_date TEXT NOT NULL,
+  returned_at TEXT
+);
