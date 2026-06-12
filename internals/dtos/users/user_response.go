@@ -1,14 +1,15 @@
 package users
 
 import (
+	"errors"
 	"time"
 
-	"github.com/Projeto-fullstack-UVA/estante-viva-api/internals/models"
+	"github.com/Projeto-fullstack-UVA/estante-viva-api/internals/auth"
+	"github.com/Projeto-fullstack-UVA/estante-viva-api/internals/entities"
 )
 
-// UserResponse is the user representation returned to clients (never the password).
 type UserResponse struct {
-	ID        string    `json:"id"`
+	ID        int64     `json:"id"`
 	Name      string    `json:"name"`
 	Email     string    `json:"email"`
 	Address   string    `json:"address"`
@@ -18,9 +19,15 @@ type UserResponse struct {
 	Campus    string    `json:"campus"`
 	Score     int16     `json:"score"`
 	CreatedAt time.Time `json:"created_at"`
+	Token     string
 }
 
-func NewUserResponse(u models.User) UserResponse {
+type LoginResponse struct {
+	ID      int64  `json:"id"`
+	Token   string
+}
+
+func NewUserResponse(u entities.User) UserResponse {
 	return UserResponse{
 		ID:        u.ID,
 		Name:      u.Name,
@@ -35,10 +42,22 @@ func NewUserResponse(u models.User) UserResponse {
 	}
 }
 
-func NewUserResponseList(list []models.User) []UserResponse {
+func NewUserResponseList(list []entities.User) []UserResponse {
 	out := make([]UserResponse, 0, len(list))
 	for _, u := range list {
 		out = append(out, NewUserResponse(u))
 	}
 	return out
+}
+
+func NewLoginResponse(u *entities.User) (LoginResponse, error) {
+    token, err := auth.GenerateToken(&u.ID, &u.Role)
+	if err != nil {
+		return LoginResponse{}, errors.New("Login failed")
+	}
+
+	return LoginResponse{
+		ID:   u.ID,
+		Token: token,
+	}, nil
 }

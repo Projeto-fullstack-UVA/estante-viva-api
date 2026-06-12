@@ -27,7 +27,8 @@ func Login(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, userdto.NewUserResponse(*user))
+	c.Header("Authorization", user.Token)
+	c.JSON(http.StatusOK, user)
 }
 
 func Register(c *gin.Context) {
@@ -37,7 +38,7 @@ func Register(c *gin.Context) {
 		return
 	}
 
-	if err := services.Register(req.ToModel()); err != nil {
+	if err := services.Register(req); err != nil {
 		c.String(http.StatusInternalServerError, "Error while creating user")
 		return
 	}
@@ -52,7 +53,7 @@ func ListUsers(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, userdto.NewUserResponseList(users))
+	c.JSON(http.StatusOK, users)
 }
 
 func FindUser(c *gin.Context) {
@@ -72,5 +73,5 @@ func FindUser(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, userdto.NewUserResponse(*user))
+	c.JSON(http.StatusOK, user)
 }

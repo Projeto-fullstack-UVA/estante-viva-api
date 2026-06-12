@@ -17,7 +17,7 @@ func ListBooks(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, bookdto.NewBookResponseList(books))
+	c.JSON(http.StatusOK, books)
 }
 
 func FindBook(c *gin.Context) {
@@ -37,7 +37,7 @@ func FindBook(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, bookdto.NewBookResponse(*book))
+	c.JSON(http.StatusOK, book)
 }
 
 func CreateBook(c *gin.Context) {
@@ -47,7 +47,7 @@ func CreateBook(c *gin.Context) {
 		return
 	}
 
-	if err := services.CreateBook(req.ToModel()); err != nil {
+	if err := services.CreateBook(req); err != nil {
 		c.String(http.StatusInternalServerError, "Error while creating book")
 		return
 	}

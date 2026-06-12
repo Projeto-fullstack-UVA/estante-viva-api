@@ -3,21 +3,20 @@ package books
 import (
 	"time"
 
-	"github.com/Projeto-fullstack-UVA/estante-viva-api/internals/models"
+	"github.com/Projeto-fullstack-UVA/estante-viva-api/internals/entities"
 )
 
-// BookResponse is the book representation returned to clients.
 type BookResponse struct {
 	ID          string    `json:"id"`
 	Title       string    `json:"title"`
 	Author      string    `json:"author"`
-	ReleaseDate string    `json:"release_date"`
+	ReleaseDate time.Time `json:"release_date"`
 	Edition     string    `json:"edition"`
 	Status      string    `json:"status"`
 	CreatedAt   time.Time `json:"created_at"`
 }
 
-func NewBookResponse(b models.Book) BookResponse {
+func NewBookResponse(b entities.Book) BookResponse {
 	return BookResponse{
 		ID:          b.ID,
 		Title:       b.Title,
@@ -29,7 +28,7 @@ func NewBookResponse(b models.Book) BookResponse {
 	}
 }
 
-func NewBookResponseList(list []models.Book) []BookResponse {
+func NewBookResponseList(list []entities.Book) []BookResponse {
 	out := make([]BookResponse, 0, len(list))
 	for _, b := range list {
 		out = append(out, NewBookResponse(b))

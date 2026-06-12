@@ -5,15 +5,15 @@ import (
 	"errors"
 	"strconv"
 
-	"github.com/Projeto-fullstack-UVA/estante-viva-api/internals/models"
+	"github.com/Projeto-fullstack-UVA/estante-viva-api/internals/entities"
 	"github.com/jackc/pgx/v5"
 )
 
-func scanBook(row pgx.Row) (*models.Book, error) {
+func scanBook(row pgx.Row) (*entities.Book, error) {
 	var (
 		id      int64
 		edition *string
-		b       models.Book
+		b       entities.Book
 	)
 	err := row.Scan(&id, &b.Title, &b.Author, &b.ReleaseDate, &edition, &b.Status, &b.CreatedAt)
 	if err != nil {
@@ -29,7 +29,7 @@ func scanBook(row pgx.Row) (*models.Book, error) {
 	return &b, nil
 }
 
-func GetBooks() ([]models.Book, error) {
+func GetBooks() ([]entities.Book, error) {
 	rows, err := Pool.Query(context.Background(),
 		`SELECT id, title, author, release_date, edition, status, created_at FROM books ORDER BY id`)
 	if err != nil {
@@ -37,7 +37,7 @@ func GetBooks() ([]models.Book, error) {
 	}
 	defer rows.Close()
 
-	books := []models.Book{}
+	books := []entities.Book{}
 	for rows.Next() {
 		b, err := scanBook(rows)
 		if err != nil {
@@ -48,22 +48,21 @@ func GetBooks() ([]models.Book, error) {
 	return books, rows.Err()
 }
 
-func GetBookByID(id int64) (*models.Book, error) {
+func GetBookByID(id int64) (*entities.Book, error) {
 	row := Pool.QueryRow(context.Background(),
 		`SELECT id, title, author, release_date, edition, status, created_at FROM books WHERE id = $1`, id)
 	return scanBook(row)
 }
 
-// CreateBook inserts a book and returns the number of rows affected.
-func CreateBook(b models.Book) (int64, error) {
+func CreateBook(book entities.Book) (int64, error) {
 	var edition *string
-	if b.Edition != "" {
-		edition = &b.Edition
+	if book.Edition != "" {
+		edition = &book.Edition
 	}
 	tag, err := Pool.Exec(context.Background(),
 		`INSERT INTO books (title, author, release_date, edition, status, created_at)
 		 VALUES ($1, $2, $3, $4, $5, $6)`,
-		b.Title, b.Author, b.ReleaseDate, edition, b.Status, b.CreatedAt,
+		book.Title, book.Author, book.ReleaseDate, edition, book.Status, book.CreatedAt,
 	)
 	if err != nil {
 		return 0, err

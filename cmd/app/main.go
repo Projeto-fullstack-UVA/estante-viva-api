@@ -7,6 +7,7 @@ import (
 	"slices"
 
 	"github.com/Projeto-fullstack-UVA/estante-viva-api/internals/controllers"
+	"github.com/Projeto-fullstack-UVA/estante-viva-api/internals/middleware"
 	"github.com/Projeto-fullstack-UVA/estante-viva-api/internals/repositories"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
@@ -38,7 +39,7 @@ func cors() gin.HandlerFunc {
 
 func main() {
 	if err := godotenv.Load(); err != nil {
-		log.Println("no .env file found, relying on environment variables")
+		log.Fatal("No .env file found")
 	}
 
 	databaseURL := os.Getenv("DATABASE_URL")
@@ -47,26 +48,27 @@ func main() {
 	}
 
 	if err := repositories.Init(databaseURL); err != nil {
-		log.Fatalf("failed to connect to database: %v", err)
+		log.Fatalf("Failed to connect to database: %v", err)
 	}
 
-	r := gin.Default()
-	r.Use(cors())
+	router := gin.Default()
+	router.Use(cors())
 
-	r.POST("/login", controllers.Login)
-	r.GET("/users", controllers.ListUsers)
-	r.POST("/users", controllers.Register)
-	r.GET("/users/:id", controllers.FindUser)
-	r.GET("/books", controllers.ListBooks)
-	r.POST("/books", controllers.CreateBook)
-	r.GET("/books/:id", controllers.FindBook)
-	r.GET("/loans", controllers.ListLoans)
-	r.POST("/loans", controllers.BorrowBook)
-	r.GET("/loans/:id", controllers.FindLoan)
-	r.PATCH("/loans/:id", controllers.ReturnBook)
+	router.POST("/login", middleware.Authentication, controllers.Login)
+	router.GET("/users", controllers.ListUsers)
+	router.POST("/users", controllers.Register)
+	router.GET("/users/:id", controllers.FindUser)
+	router.GET("/books", controllers.ListBooks)
+	router.POST("/books", controllers.CreateBook)
+	router.GET("/books/:id", controllers.FindBook)
+	router.GET("/loans", controllers.ListLoans)
+	router.POST("/loans", controllers.BorrowBook)
+	router.GET("/loans/:id", controllers.FindLoan)
+	router.PATCH("/loans/:id", controllers.ReturnBook)
 
-	log.Println("Server running on http://localhost:3000")
-	if err := r.Run(":3000"); err != nil {
+	log.Println("Server running on http://localhost:8080")
+	
+	if err := router.Run(":8080"); err != nil {
 		log.Fatal(err)
 	}
 }

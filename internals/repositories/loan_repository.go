@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 
-	"github.com/Projeto-fullstack-UVA/estante-viva-api/internals/models"
+	"github.com/Projeto-fullstack-UVA/estante-viva-api/internals/entities"
 	"github.com/jackc/pgx/v5"
 )
 
@@ -13,8 +13,8 @@ const loanSelect = `SELECT l.id, l.user_id, l.book_id, l.return_date, l.returned
 	FROM loans l
 	JOIN books b ON l.book_id = b.id`
 
-func scanLoan(row pgx.Row) (*models.Loan, error) {
-	var l models.Loan
+func scanLoan(row pgx.Row) (*entities.Loan, error) {
+	var l entities.Loan
 	err := row.Scan(
 		&l.ID, &l.UserID, &l.BookID, &l.ReturnDate,
 		&l.ReturnedAt, &l.BookTitle, &l.BookAuthor,
@@ -28,14 +28,14 @@ func scanLoan(row pgx.Row) (*models.Loan, error) {
 	return &l, nil
 }
 
-func GetLoans() ([]models.Loan, error) {
+func GetLoans() ([]entities.Loan, error) {
 	rows, err := Pool.Query(context.Background(), loanSelect+" ORDER BY l.id")
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
 
-	loans := []models.Loan{}
+	loans := []entities.Loan{}
 	for rows.Next() {
 		l, err := scanLoan(rows)
 		if err != nil {
@@ -46,8 +46,8 @@ func GetLoans() ([]models.Loan, error) {
 	return loans, rows.Err()
 }
 
-func GetLoanByID(id int64) (*models.Loan, error) {
-	row := Pool.QueryRow(context.Background(), loanSelect+" WHERE l.id = $1", id)
+func GetLoanByID(id int64) (*entities.Loan, error) {
+	row := Pool.QueryRow(context.Background(), loanSelect + " WHERE l.id = $1", id)
 	return scanLoan(row)
 }
 

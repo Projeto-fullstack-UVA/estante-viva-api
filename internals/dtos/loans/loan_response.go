@@ -1,19 +1,22 @@
 package loans
 
-import "github.com/Projeto-fullstack-UVA/estante-viva-api/internals/models"
+import (
+	"time"
 
-// LoanResponse is a loan joined with its book's title and author.
+	"github.com/Projeto-fullstack-UVA/estante-viva-api/internals/entities"
+)
+
 type LoanResponse struct {
-	ID         int64   `json:"id"`
-	UserID     int64   `json:"user_id"`
-	BookID     int64   `json:"book_id"`
-	ReturnDate string  `json:"return_date"`
-	ReturnedAt *string `json:"returned_at"`
-	BookTitle  string  `json:"book_title"`
-	BookAuthor string  `json:"book_author"`
+	ID         int64      `json:"id"`
+	UserID     int64      `json:"user_id"`
+	BookID     int64      `json:"book_id"`
+	ReturnDate time.Time  `json:"return_date"`
+	ReturnedAt *time.Time `json:"returned_at"`
+	BookTitle  string     `json:"book_title"`
+	BookAuthor string     `json:"book_author"`
 }
 
-func NewLoanResponse(l models.Loan) LoanResponse {
+func NewLoanResponse(l entities.Loan) LoanResponse {
 	return LoanResponse{
 		ID:         l.ID,
 		UserID:     l.UserID,
@@ -25,7 +28,7 @@ func NewLoanResponse(l models.Loan) LoanResponse {
 	}
 }
 
-func NewLoanResponseList(list []models.Loan) []LoanResponse {
+func NewLoanResponseList(list []entities.Loan) []LoanResponse {
 	out := make([]LoanResponse, 0, len(list))
 	for _, l := range list {
 		out = append(out, NewLoanResponse(l))

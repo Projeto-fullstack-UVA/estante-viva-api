@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS loans (
   id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-  user_id BIGINT NOT NULL REFERENCES users(id),
-  book_id BIGINT NOT NULL REFERENCES books(id),
-  return_date TEXT NOT NULL,
-  returned_at TEXT
+  user_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  book_id BIGINT NOT NULL REFERENCES books(id) ON DELETE CASCADE,
+  return_date DATE NOT NULL,
+  returned_at DATE
 );

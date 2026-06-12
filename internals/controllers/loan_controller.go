@@ -17,7 +17,7 @@ func ListLoans(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, loandto.NewLoanResponseList(loans))
+	c.JSON(http.StatusOK, loans)
 }
 
 func FindLoan(c *gin.Context) {
@@ -37,7 +37,7 @@ func FindLoan(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, loandto.NewLoanResponse(*loan))
+	c.JSON(http.StatusOK, loan)
 }
 
 func BorrowBook(c *gin.Context) {
@@ -60,7 +60,7 @@ func BorrowBook(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusCreated, loandto.NewLoanResponse(*loan))
+	c.JSON(http.StatusCreated, loan)
 }
 
 func ReturnBook(c *gin.Context) {
@@ -83,5 +83,5 @@ func ReturnBook(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, loandto.NewLoanResponse(*loan))
+	c.JSON(http.StatusOK, loan)
 }

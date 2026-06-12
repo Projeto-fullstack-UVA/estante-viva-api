@@ -3,7 +3,7 @@ package users
 import (
 	"time"
 
-	"github.com/Projeto-fullstack-UVA/estante-viva-api/internals/models"
+	"github.com/Projeto-fullstack-UVA/estante-viva-api/internals/entities"
 )
 
 // CreateUserRequest is the expected body for POST /users.
@@ -20,8 +20,8 @@ type CreateUserRequest struct {
 	CreatedAt time.Time `json:"created_at" binding:"required"`
 }
 
-func (r CreateUserRequest) ToModel() models.User {
-	return models.User{
+func (r CreateUserRequest) ToModel() entities.User {
+	return entities.User{
 		Name:      r.Name,
 		Email:     r.Email,
 		Password:  r.Password,

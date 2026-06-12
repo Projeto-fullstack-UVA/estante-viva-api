@@ -3,19 +3,22 @@ package services
 import (
 	"time"
 
-	"github.com/Projeto-fullstack-UVA/estante-viva-api/internals/models"
+	loandto "github.com/Projeto-fullstack-UVA/estante-viva-api/internals/dtos/loans"
 	"github.com/Projeto-fullstack-UVA/estante-viva-api/internals/repositories"
 )
 
 // isoTimestamp mirrors JavaScript's Date.toISOString() (UTC, millisecond precision).
 const isoTimestamp = "2006-01-02T15:04:05.000Z"
 
-func ListLoans() ([]models.Loan, error) {
-	return repositories.GetLoans()
+func ListLoans() ([]loandto.LoanResponse, error) {
+	loans, err := repositories.GetLoans()
+	if err != nil {
+		return nil, err
+	}
+	return loandto.NewLoanResponseList(loans), nil
 }
 
-// FindLoan returns the loan with the given id, or ErrLoanNotFound.
-func FindLoan(id int64) (*models.Loan, error) {
+func FindLoan(id int64) (*loandto.LoanResponse, error) {
 	loan, err := repositories.GetLoanByID(id)
 	if err != nil {
 		return nil, err
@@ -23,12 +26,11 @@ func FindLoan(id int64) (*models.Loan, error) {
 	if loan == nil {
 		return nil, ErrLoanNotFound
 	}
-	return loan, nil
+	resp := loandto.NewLoanResponse(*loan)
+	return &resp, nil
 }
 
-// BorrowBook lends an available book to a user and marks it as lent. The
-// return date is set to 14 days from now.
-func BorrowBook(userID, bookID int64) (*models.Loan, error) {
+func BorrowBook(userID, bookID int64) (*loandto.LoanResponse, error) {
 	book, err := repositories.GetBookByID(bookID)
 	if err != nil {
 		return nil, err
@@ -51,11 +53,10 @@ func BorrowBook(userID, bookID int64) (*models.Loan, error) {
 		return nil, err
 	}
 
-	return repositories.GetLoanByID(id)
+	return FindLoan(id)
 }
 
-// ReturnBook marks an outstanding loan as returned and frees up the book.
-func ReturnBook(id int64) (*models.Loan, error) {
+func ReturnBook(id int64) (*loandto.LoanResponse, error) {
 	loan, err := repositories.GetLoanByID(id)
 	if err != nil {
 		return nil, err
@@ -78,5 +79,5 @@ func ReturnBook(id int64) (*models.Loan, error) {
 		return nil, err
 	}
 
-	return repositories.GetLoanByID(id)
+	return FindLoan(id)
 }

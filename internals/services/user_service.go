@@ -1,24 +1,37 @@
 package services
 
 import (
-	"github.com/Projeto-fullstack-UVA/estante-viva-api/internals/models"
+	userdto "github.com/Projeto-fullstack-UVA/estante-viva-api/internals/dtos/users"
 	"github.com/Projeto-fullstack-UVA/estante-viva-api/internals/repositories"
+	"github.com/Projeto-fullstack-UVA/estante-viva-api/internals/utils"
 )
 
-// Login returns the user matching the given credentials, or ErrUserNotFound.
-func Login(email, password string) (*models.User, error) {
-	user, err := repositories.GetUserByCredentials(email, password)
+// Login verifies the credentials and returns the matching user, or ErrUserNotFound.
+func Login(email, password string) (*userdto.LoginResponse, error) {
+	user, err := repositories.GetUserByEmail(email)
 	if err != nil {
 		return nil, err
 	}
 	if user == nil {
 		return nil, ErrUserNotFound
 	}
-	return user, nil
+	if err := utils.CheckPassword(user.Password, password); err != nil {
+		return nil, ErrUserNotFound
+	}
+	
+	resp, _ := userdto.NewLoginResponse(user)
+	return &resp, nil
 }
 
-// Register creates a new user, returning ErrUserCreateFailed when nothing was inserted.
-func Register(user models.User) error {
+func Register(req userdto.CreateUserRequest) error {
+	user := req.ToModel()
+
+	hashed, err := utils.HashPassword(user.Password)
+	if err != nil {
+		return err
+	}
+	user.Password = hashed
+
 	affected, err := repositories.CreateUser(user)
 	if err != nil {
 		return err
@@ -29,12 +42,16 @@ func Register(user models.User) error {
 	return nil
 }
 
-func ListUsers() ([]models.User, error) {
-	return repositories.GetUsers()
+func ListUsers() ([]userdto.UserResponse, error) {
+	users, err := repositories.GetUsers()
+	if err != nil {
+		return nil, err
+	}
+	return userdto.NewUserResponseList(users), nil
 }
 
 // FindUser returns the user with the given id, or ErrUserNotFound.
-func FindUser(id int64) (*models.User, error) {
+func FindUser(id int64) (*userdto.UserResponse, error) {
 	user, err := repositories.GetUserByID(id)
 	if err != nil {
 		return nil, err
@@ -42,5 +59,6 @@ func FindUser(id int64) (*models.User, error) {
 	if user == nil {
 		return nil, ErrUserNotFound
 	}
-	return user, nil
+	resp := userdto.NewUserResponse(*user)
+	return &resp, nil
 }
