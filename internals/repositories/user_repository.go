@@ -14,7 +14,7 @@ func scanUser(row pgx.Row) (*entities.User, error) {
 		u  entities.User
 	)
 	err := row.Scan(
-		&id, &u.Name, &u.Email, &u.Address, &u.Document,
+		&id, &u.Name, &u.Email, &u.BirthDate, &u.Address, &u.Document,
 		&u.Cellphone, &u.Role, &u.Campus, &u.Score, &u.CreatedAt,
 	)
 	if err != nil {
@@ -29,7 +29,7 @@ func scanUser(row pgx.Row) (*entities.User, error) {
 
 func GetUsers() ([]entities.User, error) {
 	rows, err := Pool.Query(context.Background(),
-		`SELECT id, name, email, address, document, cellphone, role, campus, score, created_at
+		`SELECT id, name, email, birth_date, address, document, cellphone, role, campus, score, created_at
 		 FROM users ORDER BY id`)
 	if err != nil {
 		return nil, err
@@ -49,7 +49,7 @@ func GetUsers() ([]entities.User, error) {
 
 func GetUserByID(id int64) (*entities.User, error) {
 	row := Pool.QueryRow(context.Background(),
-		`SELECT id, name, email, address, document, cellphone, role, campus, score, created_at
+		`SELECT id, name, email, birth_date, address, document, cellphone, role, campus, score, created_at
 		 FROM users WHERE id = $1`, id)
 	return scanUser(row)
 }
@@ -58,7 +58,7 @@ func GetUserByID(id int64) (*entities.User, error) {
 // for credential verification. Returns nil when no user matches.
 func GetUserByEmail(email string) (*entities.User, error) {
 	row := Pool.QueryRow(context.Background(),
-		`SELECT id, name, email, password, address, document, cellphone, role, campus, score, created_at
+		`SELECT id, name, email, password, birth_date, address, document, cellphone, role, campus, score, created_at
 		 FROM users WHERE email = $1`, email)
 
 	var (
@@ -66,7 +66,7 @@ func GetUserByEmail(email string) (*entities.User, error) {
 		u  entities.User
 	)
 	err := row.Scan(
-		&id, &u.Name, &u.Email, &u.Password, &u.Address, &u.Document,
+		&id, &u.Name, &u.Email, &u.Password, &u.BirthDate, &u.Address, &u.Document,
 		&u.Cellphone, &u.Role, &u.Campus, &u.Score, &u.CreatedAt,
 	)
 	if err != nil {
@@ -81,10 +81,10 @@ func GetUserByEmail(email string) (*entities.User, error) {
 
 func CreateUser(user entities.User) (int64, error) {
 	tag, err := Pool.Exec(context.Background(),
-		`INSERT INTO users (name, email, password, address, document, cellphone, role, campus, score, created_at)
-		 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
+		`INSERT INTO users (name, email, password, address, document, cellphone, role, campus, score, created_at, birth_date)
+		 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`,
 		user.Name, user.Email, user.Password, user.Address, user.Document,
-		user.Cellphone, user.Role, user.Campus, user.Score, user.CreatedAt,
+		user.Cellphone, user.Role, user.Campus, user.Score, user.CreatedAt, user.BirthDate,
 	)
 	if err != nil {
 		return 0, err

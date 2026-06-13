@@ -38,12 +38,13 @@ func Register(c *gin.Context) {
 		return
 	}
 
-	if err := services.Register(req); err != nil {
-		c.String(http.StatusInternalServerError, "Error while creating user")
+	resp, err := services.Register(req)
+	if err != nil {
+		c.String(http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	c.JSON(http.StatusCreated, gin.H{"message": "User created successfully", "success": true})
+	c.JSON(http.StatusCreated, resp)
 }
 
 func ListUsers(c *gin.Context) {

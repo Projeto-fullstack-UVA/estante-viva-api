@@ -14,4 +14,5 @@ type User struct {
 	Campus    string    `json:"campus"`
 	Score     int16     `json:"score"`
 	CreatedAt time.Time `json:"created_at"`
+	BirthDate time.Time `json:"birthDate"`
 }

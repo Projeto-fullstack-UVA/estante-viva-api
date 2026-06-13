@@ -51,20 +51,22 @@ func main() {
 		log.Fatalf("Failed to connect to database: %v", err)
 	}
 
+	log.Println("Database connected")
+
 	router := gin.Default()
 	router.Use(cors())
 
-	router.POST("/login", middleware.Authentication, controllers.Login)
-	router.GET("/users", controllers.ListUsers)
+	router.POST("/login", controllers.Login)
+	router.GET("/users", middleware.Authentication, controllers.ListUsers)
 	router.POST("/users", controllers.Register)
-	router.GET("/users/:id", controllers.FindUser)
-	router.GET("/books", controllers.ListBooks)
-	router.POST("/books", controllers.CreateBook)
-	router.GET("/books/:id", controllers.FindBook)
-	router.GET("/loans", controllers.ListLoans)
-	router.POST("/loans", controllers.BorrowBook)
-	router.GET("/loans/:id", controllers.FindLoan)
-	router.PATCH("/loans/:id", controllers.ReturnBook)
+	router.GET("/users/:id", middleware.Authentication, controllers.FindUser)
+	router.GET("/books", middleware.Authentication, controllers.ListBooks)
+	router.POST("/books", middleware.Authentication, controllers.CreateBook)
+	router.GET("/books/:id", middleware.Authentication, controllers.FindBook)
+	router.GET("/loans", middleware.Authentication, controllers.ListLoans)
+	router.POST("/loans", middleware.Authentication, controllers.BorrowBook)
+	router.GET("/loans/:id", middleware.Authentication, controllers.FindLoan)
+	router.PATCH("/loans/:id", middleware.Authentication, controllers.ReturnBook)
 
 	log.Println("Server running on http://localhost:8080")
 	
