@@ -3,6 +3,7 @@ package repositories
 import (
 	"context"
 	"errors"
+	"time"
 
 	"github.com/Projeto-fullstack-UVA/estante-viva-api/internals/entities"
 	"github.com/jackc/pgx/v5"
@@ -52,7 +53,7 @@ func GetLoanByID(id int64) (*entities.Loan, error) {
 }
 
 // CreateLoan inserts a loan and returns the id of the newly created row.
-func CreateLoan(userID, bookID int64, returnDate string) (int64, error) {
+func CreateLoan(userID, bookID int64, returnDate time.Time) (int64, error) {
 	var id int64
 	err := Pool.QueryRow(context.Background(),
 		`INSERT INTO loans (user_id, book_id, return_date, returned_at)
@@ -63,7 +64,7 @@ func CreateLoan(userID, bookID int64, returnDate string) (int64, error) {
 }
 
 // ReturnLoan stamps returned_at and returns the number of rows affected.
-func ReturnLoan(id int64, returnedAt string) (int64, error) {
+func ReturnLoan(id int64, returnedAt time.Time) (int64, error) {
 	tag, err := Pool.Exec(context.Background(),
 		`UPDATE loans SET returned_at = $1 WHERE id = $2`, returnedAt, id)
 	if err != nil {

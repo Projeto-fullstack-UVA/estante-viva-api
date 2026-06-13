@@ -39,13 +39,20 @@ func cors() gin.HandlerFunc {
 
 func main() {
 	if err := godotenv.Load(); err != nil {
-		log.Fatal("No .env file found")
+		log.Fatalln("No .env file found")
+	}
+
+	jwtKey := os.Getenv("JWT_SECRET_KEY")
+	if jwtKey == "" {
+		log.Fatalln("Environment variable JWT_SECRET_KEY is not set")
 	}
 
 	databaseURL := os.Getenv("DATABASE_URL")
 	if databaseURL == "" {
-		log.Fatal("DATABASE_URL is not set")
+		log.Fatalln("Environment variable DATABASE_URL is not set")
 	}
+
+	log.Println("Success loading the environment variables")
 
 	if err := repositories.Init(databaseURL); err != nil {
 		log.Fatalf("Failed to connect to database: %v", err)
@@ -71,6 +78,6 @@ func main() {
 	log.Println("Server running on http://localhost:8080")
 	
 	if err := router.Run(":8080"); err != nil {
-		log.Fatal(err)
+		log.Fatalln(err)
 	}
 }
