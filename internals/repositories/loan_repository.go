@@ -72,3 +72,11 @@ func ReturnLoan(id int64, returnedAt time.Time) (int64, error) {
 	}
 	return tag.RowsAffected(), nil
 }
+
+func DeleteLoan(id int64) (int64, error) {
+	tag, err := Pool.Exec(context.Background(), `DELETE FROM loans WHERE id = $1`, id)
+	if err != nil {
+		return 0, err
+	}
+	return tag.RowsAffected(), nil
+}

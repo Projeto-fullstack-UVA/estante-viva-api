@@ -3,17 +3,24 @@ package services
 import "errors"
 
 var (
-	ErrLoginWrongCredentials = errors.New("Wrong Credentials")
+	ErrUserNotFound     = errors.New("user not found")
+	ErrUserCreateFailed = errors.New("error while creating user")
+	ErrUserFetchFailed  = errors.New("error while fetching user")
+	ErrUserDeleteFailed = errors.New("error while deleting user")
+	ErrListUsersFailed  = errors.New("error while listing users")
 
-	ErrUserNotFound     = errors.New("User not found")
-	ErrUserCreateFailed = errors.New("Error while creating user")
+	ErrBookNotFound     = errors.New("book not found")
+	ErrBookCreateFailed = errors.New("error while creating book")
+	ErrBookFetchFailed  = errors.New("error while fetching book")
+	ErrBookDeleteFailed = errors.New("error while deleting book")
+	ErrBookNotAvailable = errors.New("book is not available")
+	ErrListBooksFailed  = errors.New("error while listing books")
 
-	ErrBookNotFound     = errors.New("Book not found")
-	ErrBookCreateFailed = errors.New("Error while creating book")
-	ErrBookNotAvailable = errors.New("Book is not available")
-
-	ErrLoanNotFound     = errors.New("Loan not found")
-	ErrLoanCreateFailed = errors.New("Error while creating loan")
-	ErrAlreadyReturned  = errors.New("Book already returned")
-	ErrReturnFailed     = errors.New("Error while returning book")
+	ErrLoanNotFound        = errors.New("loan not found")
+	ErrLoanCreateFailed    = errors.New("error while creating loan")
+	ErrLoanFetchFailed     = errors.New("error while fetching loan")
+	ErrLoanDeleteFailed    = errors.New("error while deleting loan")
+	ErrListLoansFailed     = errors.New("error while listing loans")
+	ErrBookAlreadyReturned = errors.New("book already returned")
+	ErrBookReturnFailed    = errors.New("error while returning book")
 )

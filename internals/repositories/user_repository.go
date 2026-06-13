@@ -99,3 +99,11 @@ func UpdateUserPassword(id int64, password string) error {
 	)
 	return err
 }
+
+func DeleteUser(id int64) (int64, error) {
+	tag, err := Pool.Exec(context.Background(), `DELETE FROM users WHERE id = $1`, id)
+	if err != nil {
+		return 0, err
+	}
+	return tag.RowsAffected(), nil
+}

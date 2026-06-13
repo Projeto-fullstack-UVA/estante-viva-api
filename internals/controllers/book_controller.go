@@ -13,7 +13,7 @@ import (
 func ListBooks(c *gin.Context) {
 	books, err := services.ListBooks()
 	if err != nil {
-		c.String(http.StatusInternalServerError, err.Error())
+		c.String(http.StatusInternalServerError, "Error while returning the book's list")
 		return
 	}
 
@@ -33,7 +33,7 @@ func FindBook(c *gin.Context) {
 			c.String(http.StatusNotFound, "Book not found")
 			return
 		}
-		c.String(http.StatusInternalServerError, err.Error())
+		c.String(http.StatusInternalServerError, "Error while finding book")
 		return
 	}
 
@@ -53,4 +53,23 @@ func CreateBook(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusCreated, gin.H{"message": "Book created successfully", "success": true})
+}
+
+func DeleteBook(c *gin.Context) {
+	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
+	if err != nil {
+		c.String(http.StatusBadRequest, "Invalid ID")
+		return
+	}
+
+	if err := services.DeleteBook(id); err != nil {
+		if errors.Is(err, services.ErrBookNotFound) {
+			c.String(http.StatusNotFound, "Book not found")
+			return
+		}
+		c.String(http.StatusInternalServerError, "Error while deleting book")
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Book deleted successfully", "success": true})
 }

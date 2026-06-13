@@ -13,7 +13,7 @@ func Login(email, password string) (userdto.LoginResponse, error) {
 	user, err := repositories.GetUserByEmail(email)
 	if err != nil {
 		log.Println("Error while fetching user in the database: ", err.Error())
-		return userdto.LoginResponse{}, err
+		return userdto.LoginResponse{}, ErrUserFetchFailed
 	}
 	if user == nil {
 		log.Println("User not found in the database")
@@ -26,7 +26,8 @@ func Login(email, password string) (userdto.LoginResponse, error) {
 	
 	resp, err := userdto.NewLoginResponse(user)
 	if err != nil {
-		return userdto.LoginResponse{}, err
+		log.Println("Error while building login response: ", err.Error())
+		return userdto.LoginResponse{}, ErrUserFetchFailed
 	}
 
 	log.Println("Success logging user in")
@@ -55,6 +56,7 @@ func Register(req userdto.CreateUserRequest) (userdto.RegisterUserResponse, erro
 	}
 	token, err := auth.GenerateToken(&user.ID, &user.Role)
 	if err != nil {
+		log.Println("Failed to generate jwt token: ", err.Error())
 		return userdto.RegisterUserResponse{}, ErrUserCreateFailed
 	}
 
@@ -70,7 +72,7 @@ func ListUsers() ([]userdto.UserResponse, error) {
 	users, err := repositories.GetUsers()
 	if err != nil {
 		log.Println("Error while fetching users from the database: ", err.Error())
-		return nil, err
+		return nil, ErrListUsersFailed
 	}
 
 	log.Println("Success fetching users")
@@ -82,7 +84,7 @@ func FindUser(id int64) (*userdto.UserResponse, error) {
 	user, err := repositories.GetUserByID(id)
 	if err != nil {
 		log.Println("Error fetching user from the database: ", err.Error())
-		return nil, err
+		return nil, ErrUserFetchFailed
 	}
 	if user == nil {
 		log.Println("User was not found in the database")
@@ -94,4 +96,20 @@ func FindUser(id int64) (*userdto.UserResponse, error) {
 	log.Println("Success fetching user")
 
 	return &resp, nil
+}
+
+func DeleteUser(id int64) error {
+	affected, err := repositories.DeleteUser(id)
+	if err != nil {
+		log.Println("Error while deleting user from the database: ", err.Error())
+		return ErrUserDeleteFailed
+	}
+	if affected == 0 {
+		log.Println("No user with the id ", id, " found to delete")
+		return ErrUserNotFound
+	}
+
+	log.Println("Success deleting user from the database")
+
+	return nil
 }

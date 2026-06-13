@@ -74,3 +74,11 @@ func UpdateBookStatus(id int64, status string) error {
 	_, err := Pool.Exec(context.Background(), `UPDATE books SET status = $1 WHERE id = $2`, status, id)
 	return err
 }
+
+func DeleteBook(id int64) (int64, error) {
+	tag, err := Pool.Exec(context.Background(), `DELETE FROM books WHERE id = $1`, id)
+	if err != nil {
+		return 0, err
+	}
+	return tag.RowsAffected(), nil
+}

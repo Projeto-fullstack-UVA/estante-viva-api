@@ -1,7 +1,6 @@
 package users
 
 import (
-	"log"
 	"time"
 
 	"github.com/Projeto-fullstack-UVA/estante-viva-api/internals/auth"
@@ -61,7 +60,6 @@ func NewListUserResponse(list []entities.User) []UserResponse {
 func NewLoginResponse(u *entities.User) (LoginResponse, error) {
 	token, err := auth.GenerateToken(&u.ID, &u.Role)
 	if err != nil {
-		log.Println("Error generating token ", err.Error())
 		return LoginResponse{}, err
 	}
 

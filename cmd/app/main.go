@@ -67,13 +67,16 @@ func main() {
 	router.GET("/users", middleware.Authentication, controllers.ListUsers)
 	router.POST("/users", controllers.Register)
 	router.GET("/users/:id", middleware.Authentication, controllers.FindUser)
+	router.DELETE("/users/:id", middleware.Authentication, controllers.DeleteUser)
 	router.GET("/books", middleware.Authentication, controllers.ListBooks)
 	router.POST("/books", middleware.Authentication, controllers.CreateBook)
 	router.GET("/books/:id", middleware.Authentication, controllers.FindBook)
+	router.DELETE("/books/:id", middleware.Authentication, controllers.DeleteBook)
 	router.GET("/loans", middleware.Authentication, controllers.ListLoans)
 	router.POST("/loans", middleware.Authentication, controllers.BorrowBook)
 	router.GET("/loans/:id", middleware.Authentication, controllers.FindLoan)
 	router.PATCH("/loans/:id", middleware.Authentication, controllers.ReturnBook)
+	router.DELETE("/loans/:id", middleware.Authentication, controllers.DeleteLoan)
 
 	log.Println("Server running on http://localhost:8080")
 	

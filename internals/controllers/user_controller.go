@@ -20,10 +20,10 @@ func Login(c *gin.Context) {
 	user, err := services.Login(req.Email, req.Password)
 	if err != nil {
 		if errors.Is(err, services.ErrUserNotFound) {
-			c.String(http.StatusNotFound, "User not found")
+			c.String(http.StatusUnauthorized, "Invalid email or password")
 			return
 		}
-		c.String(http.StatusInternalServerError, err.Error())
+		c.String(http.StatusInternalServerError, "Error while logging in")
 		return
 	}
 
@@ -40,7 +40,7 @@ func Register(c *gin.Context) {
 
 	resp, err := services.Register(req)
 	if err != nil {
-		c.String(http.StatusInternalServerError, err.Error())
+		c.String(http.StatusInternalServerError, "Error while creating user")
 		return
 	}
 
@@ -50,7 +50,7 @@ func Register(c *gin.Context) {
 func ListUsers(c *gin.Context) {
 	users, err := services.ListUsers()
 	if err != nil {
-		c.String(http.StatusInternalServerError, err.Error())
+		c.String(http.StatusInternalServerError, "Error while returning the user's list")
 		return
 	}
 
@@ -70,9 +70,28 @@ func FindUser(c *gin.Context) {
 			c.String(http.StatusNotFound, "User not found")
 			return
 		}
-		c.String(http.StatusInternalServerError, err.Error())
+		c.String(http.StatusInternalServerError, "Error while finding user")
 		return
 	}
 
 	c.JSON(http.StatusOK, user)
+}
+
+func DeleteUser(c *gin.Context) {
+	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
+	if err != nil {
+		c.String(http.StatusBadRequest, "Invalid ID")
+		return
+	}
+
+	if err := services.DeleteUser(id); err != nil {
+		if errors.Is(err, services.ErrUserNotFound) {
+			c.String(http.StatusNotFound, "User not found")
+			return
+		}
+		c.String(http.StatusInternalServerError, "Error while deleting user")
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "User deleted successfully", "success": true})
 }
