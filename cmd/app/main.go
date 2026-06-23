@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"os"
 	"slices"
+	"strings"
 
 	"github.com/Projeto-fullstack-UVA/estante-viva-api/internals/controllers"
 	"github.com/Projeto-fullstack-UVA/estante-viva-api/internals/middleware"
@@ -13,7 +14,15 @@ import (
 	"github.com/joho/godotenv"
 )
 
-var allowedOrigins = []string{"http://localhost:5173", "http://localhost:4173"}
+func getAllowedOrigins() []string {
+	if err := godotenv.Load(); err != nil {
+		log.Fatalln("No .env file found")
+	}
+	origins := os.Getenv("ALLOWED_ORIGINS")
+	return strings.Split(origins, ",")
+}
+
+var allowedOrigins = getAllowedOrigins()
 
 func cors() gin.HandlerFunc {
 	return func(c *gin.Context) {
@@ -26,6 +35,7 @@ func cors() gin.HandlerFunc {
 		c.Header("Access-Control-Allow-Origin", allowOrigin)
 		c.Header("Access-Control-Allow-Methods", "GET, POST, PATCH, DELETE, OPTIONS")
 		c.Header("Access-Control-Allow-Headers", "Content-Type")
+		c.Header("Access-Control-Allow-Headers", "Authorization")
 		c.Header("Vary", "Origin")
 
 		if c.Request.Method == http.MethodOptions {
