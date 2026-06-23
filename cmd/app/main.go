@@ -14,15 +14,22 @@ import (
 	"github.com/joho/godotenv"
 )
 
-func getAllowedOrigins() []string {
-	if err := godotenv.Load(); err != nil {
-		log.Fatalln("No .env file found")
-	}
-	origins := os.Getenv("ALLOWED_ORIGINS")
-	return strings.Split(origins, ",")
-}
+var allowedOrigins []string
 
-var allowedOrigins = getAllowedOrigins()
+func getAllowedOrigins() []string {
+	origins := os.Getenv("ALLOWED_ORIGINS")
+	if origins == "" {
+		log.Fatalln("Environment variable ALLOWED_ORIGINS is not set")
+	}
+
+	parts := strings.Split(origins, ",")
+	for i := range parts {
+		parts[i] = strings.TrimSpace(parts[i])
+	}
+
+	log.Println("Loaded origins variables with success")
+	return parts
+}
 
 func cors() gin.HandlerFunc {
 	return func(c *gin.Context) {
@@ -61,6 +68,8 @@ func main() {
 	if databaseURL == "" {
 		log.Fatalln("Environment variable DATABASE_URL is not set")
 	}
+
+	allowedOrigins = getAllowedOrigins()
 
 	log.Println("Success loading the environment variables")
 
