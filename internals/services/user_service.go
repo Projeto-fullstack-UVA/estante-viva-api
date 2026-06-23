@@ -23,7 +23,7 @@ func Login(email, password string) (userdto.LoginResponse, error) {
 		log.Println("The hashed password provided does not match with the one in the database")
 		return userdto.LoginResponse{}, ErrUserNotFound
 	}
-	
+
 	resp, err := userdto.NewLoginResponse(user)
 	if err != nil {
 		log.Println("Error while building login response: ", err.Error())
@@ -64,7 +64,7 @@ func Register(req userdto.CreateUserRequest) (userdto.RegisterUserResponse, erro
 	resp.Token = token
 
 	log.Println("Success creating user in the database")
-	
+
 	return resp, nil
 }
 

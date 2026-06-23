@@ -68,3 +68,20 @@ func DeleteBook(id int64) error {
 
 	return nil
 }
+
+func UpdateBook(id int64, req bookDto.UpdateBookRequest) error {
+	book := req.ToModel()
+	affected, err := repositories.UpdateBook(id, book)
+	if err != nil {
+		log.Println("Error while updating book in the database: ", err.Error())
+		return ErrBookUpdateFailed
+	}
+	if affected == 0 {
+		log.Println("No book with the id ", id, " found to update")
+		return ErrBookNotFound
+	}
+
+	log.Println("Success updating book in the database")
+
+	return nil
+}

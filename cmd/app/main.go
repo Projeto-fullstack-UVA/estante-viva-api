@@ -71,6 +71,7 @@ func main() {
 	router.GET("/books", middleware.Authentication, controllers.ListBooks)
 	router.POST("/books", middleware.Authentication, controllers.CreateBook)
 	router.GET("/books/:id", middleware.Authentication, controllers.FindBook)
+	router.PATCH("/books/:id", middleware.Authentication, controllers.UpdateBook)
 	router.DELETE("/books/:id", middleware.Authentication, controllers.DeleteBook)
 	router.GET("/loans", middleware.Authentication, controllers.ListLoans)
 	router.POST("/loans", middleware.Authentication, controllers.BorrowBook)
@@ -79,7 +80,7 @@ func main() {
 	router.DELETE("/loans/:id", middleware.Authentication, controllers.DeleteLoan)
 
 	log.Println("Server running on http://localhost:8080")
-	
+
 	if err := router.Run(":8080"); err != nil {
 		log.Fatalln(err)
 	}

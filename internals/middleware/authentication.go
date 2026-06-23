@@ -3,9 +3,9 @@ package middleware
 import (
 	"os"
 
+	"github.com/Projeto-fullstack-UVA/estante-viva-api/internals/auth"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
-	"github.com/Projeto-fullstack-UVA/estante-viva-api/internals/auth"
 )
 
 func Authentication(c *gin.Context) {

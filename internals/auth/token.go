@@ -45,7 +45,7 @@ func VerifyToken(tokenString string) (*jwt.Token, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, errors.New("Unexpected signing method")
 		}
-		
+
 		return []byte(secret), nil
 	})
 	if err != nil {

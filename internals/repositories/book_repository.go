@@ -75,6 +75,26 @@ func UpdateBookStatus(id int64, status string) error {
 	return err
 }
 
+func UpdateBook(id int64, book entities.Book) (int64, error) {
+	var edition *string
+	if book.Edition != "" {
+		edition = &book.Edition
+	}
+	tag, err := Pool.Exec(context.Background(),
+		`UPDATE books SET title = COALESCE(NULLIF($1, ''), title), 
+		 author = COALESCE(NULLIF($2, ''), author),
+		 release_date = COALESCE(NULLIF($3, '0001-01-01'::timestamp), release_date),
+		 edition = COALESCE(NULLIF($4::text, ''), edition),
+		 status = COALESCE(NULLIF($5, ''), status)
+		 WHERE id = $6`,
+		book.Title, book.Author, book.ReleaseDate, edition, book.Status, id,
+	)
+	if err != nil {
+		return 0, err
+	}
+	return tag.RowsAffected(), nil
+}
+
 func DeleteBook(id int64) (int64, error) {
 	tag, err := Pool.Exec(context.Background(), `DELETE FROM books WHERE id = $1`, id)
 	if err != nil {

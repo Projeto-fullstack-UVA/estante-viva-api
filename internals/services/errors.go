@@ -13,6 +13,7 @@ var (
 	ErrBookCreateFailed = errors.New("error while creating book")
 	ErrBookFetchFailed  = errors.New("error while fetching book")
 	ErrBookDeleteFailed = errors.New("error while deleting book")
+	ErrBookUpdateFailed = errors.New("error while updating book")
 	ErrBookNotAvailable = errors.New("book is not available")
 	ErrListBooksFailed  = errors.New("error while listing books")
 

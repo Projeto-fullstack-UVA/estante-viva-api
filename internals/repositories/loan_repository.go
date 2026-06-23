@@ -48,7 +48,7 @@ func GetLoans() ([]entities.Loan, error) {
 }
 
 func GetLoanByID(id int64) (*entities.Loan, error) {
-	row := Pool.QueryRow(context.Background(), loanSelect + " WHERE l.id = $1", id)
+	row := Pool.QueryRow(context.Background(), loanSelect+" WHERE l.id = $1", id)
 	return scanLoan(row)
 }
 
