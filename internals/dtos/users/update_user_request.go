@@ -7,13 +7,13 @@ import (
 )
 
 type UpdateUserRequest struct {
-	Name      *string    `json:"name"`
-	Email     *string    `json:"email"`
-	Address   *string    `json:"address"`
-	Document  *string    `json:"document"`
-	Cellphone *string    `json:"cellphone"`
-	Campus    *string    `json:"campus"`
-	BirthDate *time.Time `json:"birthDate"`
+	Name          *string    `json:"name"`
+	Email         *string    `json:"email"`
+	Address       *string    `json:"address"`
+	Document      *string    `json:"document"`
+	Cellphone     *string    `json:"cellphone"`
+	InstitutionID *int64     `json:"institution_id"`
+	BirthDate     *time.Time `json:"birthDate"`
 }
 
 func (r UpdateUserRequest) ToModel() entities.User {
@@ -33,8 +33,8 @@ func (r UpdateUserRequest) ToModel() entities.User {
 	if r.Cellphone != nil {
 		user.Cellphone = *r.Cellphone
 	}
-	if r.Campus != nil {
-		user.Campus = *r.Campus
+	if r.InstitutionID != nil {
+		user.InstitutionID = r.InstitutionID
 	}
 	if r.BirthDate != nil {
 		user.BirthDate = *r.BirthDate

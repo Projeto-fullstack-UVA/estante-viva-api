@@ -15,7 +15,7 @@ func scanUser(row pgx.Row) (*entities.User, error) {
 	)
 	err := row.Scan(
 		&id, &u.Name, &u.Email, &u.BirthDate, &u.Address, &u.Document,
-		&u.Cellphone, &u.Role, &u.Campus, &u.Score, &u.CreatedAt,
+		&u.Cellphone, &u.Role, &u.InstitutionID, &u.Score, &u.CreatedAt,
 	)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
@@ -29,7 +29,7 @@ func scanUser(row pgx.Row) (*entities.User, error) {
 
 func GetUsers() ([]entities.User, error) {
 	rows, err := Pool.Query(context.Background(),
-		`SELECT id, name, email, birth_date, address, document, cellphone, role, campus, score, created_at
+		`SELECT id, name, email, birth_date, address, document, cellphone, role, institution_id, score, created_at
 		 FROM users ORDER BY id`)
 	if err != nil {
 		return nil, err
@@ -49,14 +49,14 @@ func GetUsers() ([]entities.User, error) {
 
 func GetUserByID(id int64) (*entities.User, error) {
 	row := Pool.QueryRow(context.Background(),
-		`SELECT id, name, email, birth_date, address, document, cellphone, role, campus, score, created_at
+		`SELECT id, name, email, birth_date, address, document, cellphone, role, institution_id, score, created_at
 		 FROM users WHERE id = $1`, id)
 	return scanUser(row)
 }
 
 func GetUserByEmail(email string) (*entities.User, error) {
 	row := Pool.QueryRow(context.Background(),
-		`SELECT id, name, email, password, birth_date, address, document, cellphone, role, campus, score, created_at
+		`SELECT id, name, email, password, birth_date, address, document, cellphone, role, institution_id, score, created_at
 		 FROM users WHERE email = $1`, email)
 
 	var (
@@ -65,7 +65,7 @@ func GetUserByEmail(email string) (*entities.User, error) {
 	)
 	err := row.Scan(
 		&id, &u.Name, &u.Email, &u.Password, &u.BirthDate, &u.Address, &u.Document,
-		&u.Cellphone, &u.Role, &u.Campus, &u.Score, &u.CreatedAt,
+		&u.Cellphone, &u.Role, &u.InstitutionID, &u.Score, &u.CreatedAt,
 	)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
@@ -79,10 +79,10 @@ func GetUserByEmail(email string) (*entities.User, error) {
 
 func CreateUser(user entities.User) (int64, error) {
 	tag, err := Pool.Exec(context.Background(),
-		`INSERT INTO users (name, email, password, address, document, cellphone, role, campus, score, created_at, birth_date)
+		`INSERT INTO users (name, email, password, address, document, cellphone, role, institution_id, score, created_at, birth_date)
 		 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`,
 		user.Name, user.Email, user.Password, user.Address, user.Document,
-		user.Cellphone, user.Role, user.Campus, user.Score, user.CreatedAt, user.BirthDate,
+		user.Cellphone, user.Role, user.InstitutionID, user.Score, user.CreatedAt, user.BirthDate,
 	)
 	if err != nil {
 		return 0, err
@@ -113,11 +113,11 @@ func UpdateUser(id int64, user entities.User) (int64, error) {
 		 address = COALESCE(NULLIF($3, ''), address),
 		 document = COALESCE(NULLIF($4, ''), document),
 		 cellphone = COALESCE(NULLIF($5, ''), cellphone),
-		 campus = COALESCE(NULLIF($6, ''), campus),
+		 institution_id = COALESCE($6, institution_id),
 		 birth_date = COALESCE(NULLIF($7, '0001-01-01'::timestamp), birth_date)
 		 WHERE id = $8`,
 		user.Name, user.Email, user.Address, user.Document,
-		user.Cellphone, user.Campus, user.BirthDate, id,
+		user.Cellphone, user.InstitutionID, user.BirthDate, id,
 	)
 	if err != nil {
 		return 0, err
