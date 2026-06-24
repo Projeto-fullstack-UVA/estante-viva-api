@@ -77,6 +77,31 @@ func FindUser(c *gin.Context) {
 	c.JSON(http.StatusOK, user)
 }
 
+func UpdateUser(c *gin.Context) {
+	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
+	if err != nil {
+		c.String(http.StatusBadRequest, "Invalid ID")
+		return
+	}
+
+	var req userdto.UpdateUserRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.String(http.StatusBadRequest, "Invalid user format")
+		return
+	}
+
+	if err := services.UpdateUser(id, req); err != nil {
+		if errors.Is(err, services.ErrUserNotFound) {
+			c.String(http.StatusNotFound, "User not found")
+			return
+		}
+		c.String(http.StatusInternalServerError, "Error while updating user")
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "User updated successfully", "success": true})
+}
+
 func DeleteUser(c *gin.Context) {
 	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
 	if err != nil {

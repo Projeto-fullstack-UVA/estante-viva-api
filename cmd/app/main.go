@@ -85,6 +85,7 @@ func main() {
 	router.GET("/users", middleware.Authentication, controllers.ListUsers)
 	router.POST("/users", controllers.Register)
 	router.GET("/users/:id", middleware.Authentication, controllers.FindUser)
+	router.PATCH("/users/:id", middleware.Authentication, middleware.Authorization("admin"), controllers.UpdateUser)
 	router.DELETE("/users/:id", middleware.Authentication, controllers.DeleteUser)
 	router.GET("/books", middleware.Authentication, controllers.ListBooks)
 	router.POST("/books", middleware.Authentication, controllers.CreateBook)

@@ -54,8 +54,6 @@ func GetUserByID(id int64) (*entities.User, error) {
 	return scanUser(row)
 }
 
-// GetUserByEmail returns the user with the given email, password hash included,
-// for credential verification. Returns nil when no user matches.
 func GetUserByEmail(email string) (*entities.User, error) {
 	row := Pool.QueryRow(context.Background(),
 		`SELECT id, name, email, password, birth_date, address, document, cellphone, role, campus, score, created_at
@@ -102,6 +100,25 @@ func UpdateUserPassword(id int64, password string) error {
 
 func DeleteUser(id int64) (int64, error) {
 	tag, err := Pool.Exec(context.Background(), `DELETE FROM users WHERE id = $1`, id)
+	if err != nil {
+		return 0, err
+	}
+	return tag.RowsAffected(), nil
+}
+
+func UpdateUser(id int64, user entities.User) (int64, error) {
+	tag, err := Pool.Exec(context.Background(),
+		`UPDATE users SET name = COALESCE(NULLIF($1, ''), name),
+		 email = COALESCE(NULLIF($2, ''), email),
+		 address = COALESCE(NULLIF($3, ''), address),
+		 document = COALESCE(NULLIF($4, ''), document),
+		 cellphone = COALESCE(NULLIF($5, ''), cellphone),
+		 campus = COALESCE(NULLIF($6, ''), campus),
+		 birth_date = COALESCE(NULLIF($7, '0001-01-01'::timestamp), birth_date)
+		 WHERE id = $8`,
+		user.Name, user.Email, user.Address, user.Document,
+		user.Cellphone, user.Campus, user.BirthDate, id,
+	)
 	if err != nil {
 		return 0, err
 	}

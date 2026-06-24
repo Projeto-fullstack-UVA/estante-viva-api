@@ -7,6 +7,7 @@ var (
 	ErrUserCreateFailed = errors.New("error while creating user")
 	ErrUserFetchFailed  = errors.New("error while fetching user")
 	ErrUserDeleteFailed = errors.New("error while deleting user")
+	ErrUserUpdateFailed = errors.New("error while updating user")
 	ErrListUsersFailed  = errors.New("error while listing users")
 
 	ErrBookNotFound     = errors.New("book not found")

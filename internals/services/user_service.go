@@ -98,6 +98,23 @@ func FindUser(id int64) (*userdto.UserResponse, error) {
 	return &resp, nil
 }
 
+func UpdateUser(id int64, req userdto.UpdateUserRequest) error {
+	user := req.ToModel()
+	affected, err := repositories.UpdateUser(id, user)
+	if err != nil {
+		log.Println("Error while updating user in the database: ", err.Error())
+		return ErrUserUpdateFailed
+	}
+	if affected == 0 {
+		log.Println("No user with the id ", id, " found to update")
+		return ErrUserNotFound
+	}
+
+	log.Println("Success updating user in the database")
+
+	return nil
+}
+
 func DeleteUser(id int64) error {
 	affected, err := repositories.DeleteUser(id)
 	if err != nil {
