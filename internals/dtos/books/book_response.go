@@ -7,7 +7,7 @@ import (
 )
 
 type BookResponse struct {
-	ID          string    `json:"id"`
+	ID          int64     `json:"id"`
 	Title       string    `json:"title"`
 	Author      string    `json:"author"`
 	ReleaseDate time.Time `json:"release_date"`

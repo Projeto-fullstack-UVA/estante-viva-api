@@ -3,7 +3,6 @@ package repositories
 import (
 	"context"
 	"errors"
-	"strconv"
 
 	"github.com/Projeto-fullstack-UVA/estante-viva-api/internals/entities"
 	"github.com/jackc/pgx/v5"
@@ -11,18 +10,16 @@ import (
 
 func scanBook(row pgx.Row) (*entities.Book, error) {
 	var (
-		id      int64
 		edition *string
 		b       entities.Book
 	)
-	err := row.Scan(&id, &b.Title, &b.Author, &b.ReleaseDate, &edition, &b.Status, &b.CreatedAt)
+	err := row.Scan(&b.ID, &b.Title, &b.Author, &b.ReleaseDate, &edition, &b.Status, &b.CreatedAt)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			return nil, nil
 		}
 		return nil, err
 	}
-	b.ID = strconv.FormatInt(id, 10)
 	if edition != nil {
 		b.Edition = *edition
 	}

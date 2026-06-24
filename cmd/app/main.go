@@ -54,8 +54,6 @@ func cors() gin.HandlerFunc {
 }
 
 func main() {
-	// .env is only used for local development. In containers, variables are
-	// injected directly (e.g. via --env-file), so a missing file is not fatal.
 	if err := godotenv.Load(); err != nil {
 		log.Println("No .env file found, relying on environment variables")
 	}
@@ -89,6 +87,7 @@ func main() {
 	router.GET("/books/:id", middleware.Authentication, controllers.FindBook)
 	router.GET("/loans", middleware.Authentication, controllers.ListLoans)
 	router.GET("/loans/:id", middleware.Authentication, controllers.FindLoan)
+	router.GET("/institutions", middleware.Authentication, controllers.ListInstitutions)
 	router.POST("/login", controllers.Login)
 	router.POST("/users", controllers.Register)
 	router.POST("/books", middleware.Authentication, controllers.CreateBook)

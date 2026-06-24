@@ -7,6 +7,6 @@ type Event struct {
 	Name         string
 	Description  string
 	Location     string
-	IntitutionId int64
+	InstitutionId int64
 	Created_at   time.Time
 }

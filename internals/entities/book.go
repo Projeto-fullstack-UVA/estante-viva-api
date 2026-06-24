@@ -5,7 +5,7 @@ import (
 )
 
 type Book struct {
-	ID          string    `json:"id"`
+	ID          int64     `json:"id"`
 	Title       string    `json:"title"`
 	Author      string    `json:"author"`
 	Edition     string    `json:"edition"`
