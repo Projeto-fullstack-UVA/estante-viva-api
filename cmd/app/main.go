@@ -54,8 +54,10 @@ func cors() gin.HandlerFunc {
 }
 
 func main() {
+	// .env is only used for local development. In containers, variables are
+	// injected directly (e.g. via --env-file), so a missing file is not fatal.
 	if err := godotenv.Load(); err != nil {
-		log.Fatalln("No .env file found")
+		log.Println("No .env file found, relying on environment variables")
 	}
 
 	jwtKey := os.Getenv("JWT_SECRET_KEY")
