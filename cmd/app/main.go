@@ -3,39 +3,20 @@ package main
 import (
 	"log"
 	"net/http"
-	"os"
 	"slices"
-	"strings"
 
+	environment "github.com/Projeto-fullstack-UVA/estante-viva-api/internals"
 	"github.com/Projeto-fullstack-UVA/estante-viva-api/internals/controllers"
 	"github.com/Projeto-fullstack-UVA/estante-viva-api/internals/middleware"
 	"github.com/Projeto-fullstack-UVA/estante-viva-api/internals/repositories"
 	"github.com/gin-gonic/gin"
-	"github.com/joho/godotenv"
 )
-
-var allowedOrigins []string
-
-func getAllowedOrigins() []string {
-	origins := os.Getenv("ALLOWED_ORIGINS")
-	if origins == "" {
-		log.Fatalln("Environment variable ALLOWED_ORIGINS is not set")
-	}
-
-	parts := strings.Split(origins, ",")
-	for i := range parts {
-		parts[i] = strings.TrimSpace(parts[i])
-	}
-
-	log.Println("Loaded origins variables with success")
-	return parts
-}
 
 func cors() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		origin := c.GetHeader("Origin")
-		allowOrigin := allowedOrigins[0]
-		if origin != "" && slices.Contains(allowedOrigins, origin) {
+		allowOrigin := environment.AllowedOrigins[0]
+		if origin != "" && slices.Contains(environment.AllowedOrigins, origin) {
 			allowOrigin = origin
 		}
 
@@ -54,25 +35,8 @@ func cors() gin.HandlerFunc {
 }
 
 func main() {
-	if err := godotenv.Load(); err != nil {
-		log.Println("No .env file found, relying on environment variables")
-	}
-
-	jwtKey := os.Getenv("JWT_SECRET_KEY")
-	if jwtKey == "" {
-		log.Fatalln("Environment variable JWT_SECRET_KEY is not set")
-	}
-
-	databaseURL := os.Getenv("DATABASE_URL")
-	if databaseURL == "" {
-		log.Fatalln("Environment variable DATABASE_URL is not set")
-	}
-
-	allowedOrigins = getAllowedOrigins()
-
-	log.Println("Success loading the environment variables")
-
-	if err := repositories.Init(databaseURL); err != nil {
+	environment.LoadEnvironmentVariables()
+	if err := repositories.Init(environment.DatabaseURL); err != nil {
 		log.Fatalf("Failed to connect to database: %v", err)
 	}
 

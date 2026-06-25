@@ -6,6 +6,7 @@ import (
 	"strconv"
 
 	loandto "github.com/Projeto-fullstack-UVA/estante-viva-api/internals/dtos/loans"
+	"github.com/Projeto-fullstack-UVA/estante-viva-api/internals/middleware"
 	"github.com/Projeto-fullstack-UVA/estante-viva-api/internals/services"
 	"github.com/gin-gonic/gin"
 )
@@ -43,11 +44,17 @@ func FindLoan(c *gin.Context) {
 func BorrowBook(c *gin.Context) {
 	var req loandto.BorrowRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.String(http.StatusBadRequest, "Invalid loan payload — expected { user_id, book_id }")
+		c.String(http.StatusBadRequest, "Invalid loan payload: expected { book_id }")
 		return
 	}
 
-	loan, err := services.BorrowBook(req.UserID, req.BookID)
+	userId, ok := middleware.GetCurrentUserID(c)
+	if !ok {
+		c.String(http.StatusUnauthorized, "Unauthorized")
+		return
+	}
+
+	loan, err := services.BorrowBook(userId, req.BookID)
 	if err != nil {
 		switch {
 		case errors.Is(err, services.ErrBookNotFound):
