@@ -39,3 +39,10 @@ func GetInstitutions() ([]entities.Institution, error) {
 	}
 	return institutions, rows.Err()
 }
+
+func GetInstitutionById(id int64) (*entities.Institution, error) {
+	row := Pool.QueryRow(context.Background(),
+		`SELECT id, name, abbreviation, city, address, created_at FROM institutions
+		WHERE id = $1`, id)
+	return scanInstitution(row)
+}
