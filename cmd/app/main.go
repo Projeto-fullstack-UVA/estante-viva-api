@@ -42,6 +42,15 @@ func main() {
 
 	log.Println("Database connection established with success")
 
+	switch environment.GinMode {
+	case "release":
+		log.Println("Setting gin to release mode")
+		gin.SetMode(gin.ReleaseMode)
+	case "debug":
+		log.Println("Setting gin to debug mode")
+		gin.SetMode(gin.DebugMode)
+	}
+
 	router := gin.Default()
 	router.Use(cors())
 
@@ -58,7 +67,7 @@ func main() {
 	router.GET("/events/:id", middleware.Authentication, controllers.FindEvent)
 	router.POST("/login", controllers.Login)
 	router.POST("/users", controllers.Register)
-	router.POST("/books", middleware.Authentication, controllers.CreateBook)
+	router.POST("/books", middleware.Authentication, middleware.Authorization("admin", "teacher"), controllers.CreateBook)
 	router.POST("/loans", middleware.Authentication, controllers.BorrowBook)
 	router.POST("/events", middleware.Authentication, middleware.Authorization("admin", "teacher"), controllers.CreateEvent)
 	router.PATCH("/users/:id", middleware.Authentication, middleware.Authorization("admin"), controllers.UpdateUser)
@@ -69,7 +78,7 @@ func main() {
 	router.DELETE("/loans/:id", middleware.Authentication, middleware.Authorization("admin"), controllers.DeleteLoan)
 	router.DELETE("/events/:id", middleware.Authentication, middleware.Authorization("admin", "teacher"), controllers.DeleteEvent)
 
-	if err := router.Run(":8080"); err != nil {
+	if err := router.Run(environment.Port); err != nil {
 		log.Fatalln(err)
 	}
 }

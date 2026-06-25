@@ -1,20 +1,12 @@
 package middleware
 
 import (
-	"os"
-
 	"github.com/Projeto-fullstack-UVA/estante-viva-api/internals/auth"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
 )
 
 func Authentication(c *gin.Context) {
-	secret := os.Getenv("JWT_SECRET_KEY")
-	if secret == "" {
-		c.AbortWithStatus(500)
-		return
-	}
-
 	tokenString := c.GetHeader("Authorization")
 	if tokenString == "" {
 		c.AbortWithStatus(401)
