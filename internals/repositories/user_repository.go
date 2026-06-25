@@ -28,8 +28,8 @@ func scanUser(row pgx.Row) (*entities.User, error) {
 	return &u, nil
 }
 
-func GetUsers() ([]entities.User, error) {
-	rows, err := Pool.Query(context.Background(),
+func GetUsers(ctx context.Context) ([]entities.User, error) {
+	rows, err := Pool.Query(ctx,
 		`SELECT id, name, email, birth_date, address, document, cellphone, role, institution_id, score, created_at
 		 FROM users ORDER BY id`)
 	if err != nil {
@@ -48,15 +48,15 @@ func GetUsers() ([]entities.User, error) {
 	return users, rows.Err()
 }
 
-func GetUserByID(id int64) (*entities.User, error) {
-	row := Pool.QueryRow(context.Background(),
+func GetUserByID(ctx context.Context, id int64) (*entities.User, error) {
+	row := Pool.QueryRow(ctx,
 		`SELECT id, name, email, birth_date, address, document, cellphone, role, institution_id, score, created_at
 		 FROM users WHERE id = $1`, id)
 	return scanUser(row)
 }
 
-func GetUserByEmail(email string) (*entities.User, error) {
-	row := Pool.QueryRow(context.Background(),
+func GetUserByEmail(ctx context.Context, email string) (*entities.User, error) {
+	row := Pool.QueryRow(ctx,
 		`SELECT id, name, email, password, birth_date, address, document, cellphone, role, institution_id, score, created_at
 		 FROM users WHERE email = $1`, email)
 
@@ -78,8 +78,8 @@ func GetUserByEmail(email string) (*entities.User, error) {
 	return &u, nil
 }
 
-func CreateUser(user entities.User) (int64, error) {
-	tag, err := Pool.Exec(context.Background(),
+func CreateUser(ctx context.Context, user entities.User) (int64, error) {
+	tag, err := Pool.Exec(ctx,
 		`INSERT INTO users (name, email, password, address, document, cellphone, role, institution_id, score, created_at, birth_date)
 		 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`,
 		user.Name, user.Email, user.Password, user.Address, user.Document,
@@ -99,7 +99,7 @@ func UpdateUserPassword(id int64, password string) error {
 	return err
 }
 
-func DeleteUser(id int64) (int64, error) {
+func DeleteUser(ctx context.Context, id int64) (int64, error) {
 	tag, err := Pool.Exec(context.Background(), `DELETE FROM users WHERE id = $1`, id)
 	if err != nil {
 		return 0, err
@@ -107,7 +107,7 @@ func DeleteUser(id int64) (int64, error) {
 	return tag.RowsAffected(), nil
 }
 
-func UpdateUser(id int64, user entities.User) (int64, error) {
+func UpdateUser(ctx context.Context, id int64, user entities.User) (int64, error) {
 	tag, err := Pool.Exec(context.Background(),
 		`UPDATE users SET name = COALESCE(NULLIF($1, ''), name),
 		 email = COALESCE(NULLIF($2, ''), email),

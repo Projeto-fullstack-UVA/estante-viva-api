@@ -1,6 +1,7 @@
 package services
 
 import (
+	"context"
 	"log"
 
 	"github.com/Projeto-fullstack-UVA/estante-viva-api/internals/auth"
@@ -9,8 +10,8 @@ import (
 	"github.com/Projeto-fullstack-UVA/estante-viva-api/internals/utils"
 )
 
-func Login(email, password string) (userdto.LoginResponse, error) {
-	user, err := repositories.GetUserByEmail(email)
+func Login(ctx context.Context, email, password string) (userdto.LoginResponse, error) {
+	user, err := repositories.GetUserByEmail(ctx, email)
 	if err != nil {
 		log.Println("Error while fetching user in the database: ", err.Error())
 		return userdto.LoginResponse{}, ErrUserFetchFailed
@@ -35,7 +36,7 @@ func Login(email, password string) (userdto.LoginResponse, error) {
 	return resp, nil
 }
 
-func Register(req userdto.CreateUserRequest) (userdto.RegisterUserResponse, error) {
+func Register(ctx context.Context, req userdto.CreateUserRequest) (userdto.RegisterUserResponse, error) {
 	user := req.ToModel()
 
 	hashed, err := utils.HashPassword(user.Password)
@@ -45,7 +46,7 @@ func Register(req userdto.CreateUserRequest) (userdto.RegisterUserResponse, erro
 	}
 	user.Password = hashed
 
-	affected, err := repositories.CreateUser(user)
+	affected, err := repositories.CreateUser(ctx, user)
 	if err != nil {
 		log.Println("Failed to create user in the database: ", err)
 		return userdto.RegisterUserResponse{}, ErrUserCreateFailed
@@ -68,8 +69,8 @@ func Register(req userdto.CreateUserRequest) (userdto.RegisterUserResponse, erro
 	return resp, nil
 }
 
-func ListUsers() ([]userdto.UserResponse, error) {
-	users, err := repositories.GetUsers()
+func ListUsers(ctx context.Context) ([]userdto.UserResponse, error) {
+	users, err := repositories.GetUsers(ctx)
 	if err != nil {
 		log.Println("Error while fetching users from the database: ", err.Error())
 		return nil, ErrListUsersFailed
@@ -80,8 +81,8 @@ func ListUsers() ([]userdto.UserResponse, error) {
 	return userdto.NewListUserResponse(users), nil
 }
 
-func FindUser(id int64) (*userdto.UserResponse, error) {
-	user, err := repositories.GetUserByID(id)
+func FindUser(ctx context.Context, id int64) (*userdto.UserResponse, error) {
+	user, err := repositories.GetUserByID(ctx, id)
 	if err != nil {
 		log.Println("Error fetching user from the database: ", err.Error())
 		return nil, ErrUserFetchFailed
@@ -98,9 +99,9 @@ func FindUser(id int64) (*userdto.UserResponse, error) {
 	return &resp, nil
 }
 
-func UpdateUser(id int64, req userdto.UpdateUserRequest) error {
+func UpdateUser(ctx context.Context, id int64, req userdto.UpdateUserRequest) error {
 	user := req.ToModel()
-	affected, err := repositories.UpdateUser(id, user)
+	affected, err := repositories.UpdateUser(ctx, id, user)
 	if err != nil {
 		log.Println("Error while updating user in the database: ", err.Error())
 		return ErrUserUpdateFailed
@@ -115,8 +116,8 @@ func UpdateUser(id int64, req userdto.UpdateUserRequest) error {
 	return nil
 }
 
-func DeleteUser(id int64) error {
-	affected, err := repositories.DeleteUser(id)
+func DeleteUser(ctx context.Context, id int64) error {
+	affected, err := repositories.DeleteUser(ctx, id)
 	if err != nil {
 		log.Println("Error while deleting user from the database: ", err.Error())
 		return ErrUserDeleteFailed

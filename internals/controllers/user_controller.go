@@ -18,7 +18,7 @@ func Login(c *gin.Context) {
 		return
 	}
 
-	user, err := services.Login(req.Email, req.Password)
+	user, err := services.Login(c.Request.Context(), req.Email, req.Password)
 	if err != nil {
 		if errors.Is(err, services.ErrUserNotFound) {
 			c.String(http.StatusUnauthorized, "Invalid email or password")
@@ -39,7 +39,7 @@ func Register(c *gin.Context) {
 		return
 	}
 
-	resp, err := services.Register(req)
+	resp, err := services.Register(c.Request.Context(), req)
 	if err != nil {
 		c.String(http.StatusInternalServerError, "Error while creating user")
 		return
@@ -55,7 +55,7 @@ func GetMe(c *gin.Context) {
 		return
 	}
 
-	user, err := services.FindUser(id)
+	user, err := services.FindUser(c.Request.Context(), id)
 	if err != nil {
 		if errors.Is(err, services.ErrUserNotFound) {
 			c.String(http.StatusNotFound, "User not found")
@@ -69,7 +69,7 @@ func GetMe(c *gin.Context) {
 }
 
 func ListUsers(c *gin.Context) {
-	users, err := services.ListUsers()
+	users, err := services.ListUsers(c.Request.Context())
 	if err != nil {
 		c.String(http.StatusInternalServerError, "Error while returning the user's list")
 		return
@@ -85,7 +85,7 @@ func FindUser(c *gin.Context) {
 		return
 	}
 
-	user, err := services.FindUser(id)
+	user, err := services.FindUser(c.Request.Context(), id)
 	if err != nil {
 		if errors.Is(err, services.ErrUserNotFound) {
 			c.String(http.StatusNotFound, "User not found")
@@ -111,7 +111,7 @@ func UpdateUser(c *gin.Context) {
 		return
 	}
 
-	if err := services.UpdateUser(id, req); err != nil {
+	if err := services.UpdateUser(c.Request.Context(), id, req); err != nil {
 		if errors.Is(err, services.ErrUserNotFound) {
 			c.String(http.StatusNotFound, "User not found")
 			return
@@ -130,7 +130,7 @@ func DeleteUser(c *gin.Context) {
 		return
 	}
 
-	if err := services.DeleteUser(id); err != nil {
+	if err := services.DeleteUser(c.Request.Context(), id); err != nil {
 		if errors.Is(err, services.ErrUserNotFound) {
 			c.String(http.StatusNotFound, "User not found")
 			return
