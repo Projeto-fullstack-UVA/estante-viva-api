@@ -36,3 +36,33 @@ func FindInstitution(ctx context.Context, id int64) (*institutionDto.Institution
 	resp := institutionDto.NewInstitutionResponse(*institution)
 	return &resp, nil
 }
+
+func CreateInstitution(ctx context.Context, req institutionDto.CreateInstitutionRequest) error {
+	affected, err := repositories.CreateInstitution(ctx, req.ToModel())
+	if err != nil {
+		log.Println("Error while creating institution in the database: ", err)
+		return ErrInstitutionCreateFailed
+	}
+	if affected == 0 {
+		log.Println("Failed to register institution")
+		return ErrInstitutionCreateFailed
+	}
+
+	log.Println("Success creating institution in the database")
+	return nil
+}
+
+func DeleteInstitution(ctx context.Context, id int64) error {
+	affected, err := repositories.DeleteInstitution(ctx, id)
+	if err != nil {
+		log.Println("Error while deleting institution in the database: ", err)
+		return ErrInstitutionDeleteFailed
+	}
+	if affected == 0 {
+		log.Println("No institution found to delete with the provided id")
+		return ErrInstitutionNotFound
+	}
+
+	log.Println("Institution deleted successfully")
+	return nil
+}

@@ -60,6 +60,7 @@ func main() {
 	router.POST("/users", controllers.Register)
 	router.POST("/books", middleware.Authentication, middleware.Authorization("admin", "teacher"), controllers.CreateBook)
 	router.POST("/loans", middleware.Authentication, controllers.BorrowBook)
+	router.POST("/institutions", middleware.Authentication, middleware.Authorization("admin"), controllers.CreateInstitution)
 	router.POST("/events", middleware.Authentication, middleware.Authorization("admin", "teacher"), controllers.CreateEvent)
 	router.PATCH("/users/:id", middleware.Authentication, middleware.Authorization("admin"), controllers.UpdateUser)
 	router.PATCH("/books/:id", middleware.Authentication, middleware.Authorization("admin", "teacher"), controllers.UpdateBook)
@@ -67,6 +68,7 @@ func main() {
 	router.DELETE("/users/:id", middleware.Authentication, middleware.Authorization("admin"), controllers.DeleteUser)
 	router.DELETE("/books/:id", middleware.Authentication, middleware.Authorization("admin"), controllers.DeleteBook)
 	router.DELETE("/loans/:id", middleware.Authentication, middleware.Authorization("admin"), controllers.DeleteLoan)
+	router.DELETE("/institutions/:id", middleware.Authentication, middleware.Authorization("admin"), controllers.DeleteInstitution)
 	router.DELETE("/events/:id", middleware.Authentication, middleware.Authorization("admin", "teacher"), controllers.DeleteEvent)
 
 	if err := router.Run(environment.Port); err != nil {

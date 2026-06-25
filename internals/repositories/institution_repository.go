@@ -3,6 +3,7 @@ package repositories
 import (
 	"context"
 	"errors"
+	"time"
 
 	"github.com/Projeto-fullstack-UVA/estante-viva-api/internals/entities"
 	"github.com/jackc/pgx/v5"
@@ -23,7 +24,7 @@ func scanInstitution(row pgx.Row) (*entities.Institution, error) {
 
 func GetInstitutions(ctx context.Context) ([]entities.Institution, error) {
 	rows, err := Pool.Query(ctx,
-		`SELECT id, name, abbreviation, city, address, created_at FROM institutions ORDER BY id`)
+		`SELECT id, name, abbreviation, city, address, created_at FROM institutions ORDER BY name`)
 	if err != nil {
 		return nil, err
 	}
@@ -45,4 +46,23 @@ func GetInstitutionById(ctx context.Context, id int64) (*entities.Institution, e
 		`SELECT id, name, abbreviation, city, address, created_at FROM institutions
 		WHERE id = $1`, id)
 	return scanInstitution(row)
+}
+
+func CreateInstitution(ctx context.Context, i entities.Institution) (int64, error) {
+	result, err := Pool.Exec(ctx,
+		`INSERT INTO institutions (name, abbreviation, city, address, created_at) VALUES
+		($1, $2, $3, $4, $5)`, i.Name, i.Abbreviation, i.City, i.Address, time.Now())
+	if err != nil {
+		return 0, err
+	}
+	return result.RowsAffected(), nil
+}
+
+func DeleteInstitution(ctx context.Context, id int64) (int64, error) {
+	result, err := Pool.Exec(ctx,
+		`DELETE FROM institutions WHERE id = $1`, id)
+	if err != nil {
+		return 0, err
+	}
+	return result.RowsAffected(), nil
 }

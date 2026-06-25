@@ -26,8 +26,10 @@ var (
 	ErrBookAlreadyReturned = errors.New("Book already returned")
 	ErrBookReturnFailed    = errors.New("Error while returning book")
 
-	ErrInstitutionNotFound    = errors.New("Institution not found")
-	ErrInstitutionFetchFailed = errors.New("Error while fetching institution")
+	ErrInstitutionNotFound     = errors.New("Institution not found")
+	ErrInstitutionFetchFailed  = errors.New("Error while fetching institution")
+	ErrInstitutionCreateFailed = errors.New("Error while creating institution")
+	ErrInstitutionDeleteFailed = errors.New("Error while deleting institution")
 
 	ErrEventNotFound     = errors.New("Event not found")
 	ErrEventListFailed   = errors.New("Error while listing events")
