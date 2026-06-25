@@ -5,11 +5,11 @@ import (
 )
 
 type InstitutionResponse struct {
-	ID           int64     `json:"id"`
-	Name         string    `json:"name"`
-	Abbreviation string    `json:"abbreviation"`
-	City         string    `json:"city"`
-	Address      string    `json:"address"`
+	ID           int64  `json:"id"`
+	Name         string `json:"name"`
+	Abbreviation string `json:"abbreviation"`
+	City         string `json:"city"`
+	Address      string `json:"address"`
 }
 
 func NewInstitutionResponse(i entities.Institution) InstitutionResponse {

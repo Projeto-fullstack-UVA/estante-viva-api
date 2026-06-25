@@ -10,10 +10,10 @@ type CreateInstitutionRequest struct {
 }
 
 func (i CreateInstitutionRequest) ToModel() entities.Institution {
-	return entities.Institution {
-		Name: i.Name,
+	return entities.Institution{
+		Name:         i.Name,
 		Abbreviation: i.Abbreviation,
-		City: i.City,
-		Address: i.Address,
+		City:         i.City,
+		Address:      i.Address,
 	}
 }

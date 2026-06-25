@@ -61,7 +61,7 @@ func DeleteEvent(ctx context.Context, id int64) error {
 		log.Println("Failed to delete event in the database")
 		return ErrDeleteEventFailed
 	}
-	
+
 	log.Println("Event deleted successfully")
 	return nil
 }

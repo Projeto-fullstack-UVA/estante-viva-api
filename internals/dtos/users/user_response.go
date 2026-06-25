@@ -19,15 +19,15 @@ type LoginResponse struct {
 }
 
 type UserResponse struct {
-	ID            int64     `json:"id"`
-	Name          string    `json:"name"`
-	Email         string    `json:"email"`
-	Address       string    `json:"address"`
-	Document      string    `json:"document"`
-	Cellphone     string    `json:"cellphone"`
-	Role          string    `json:"role"`
-	InstitutionID *int64    `json:"institution_id"`
-	Score         int16     `json:"score"`
+	ID            int64      `json:"id"`
+	Name          string     `json:"name"`
+	Email         string     `json:"email"`
+	Address       string     `json:"address"`
+	Document      string     `json:"document"`
+	Cellphone     string     `json:"cellphone"`
+	Role          string     `json:"role"`
+	InstitutionID *int64     `json:"institution_id"`
+	Score         int16      `json:"score"`
 	CreatedAt     *time.Time `json:"created_at"`
 }
 

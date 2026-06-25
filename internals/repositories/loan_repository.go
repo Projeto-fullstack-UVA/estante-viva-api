@@ -57,13 +57,13 @@ func CreateLoan(ctx context.Context, userID, bookID int64, returnDate time.Time)
 	var id int64
 
 	log.Println("Beginning transaction to borrow book...")
-	
+
 	tx, err := Pool.BeginTx(ctx, pgx.TxOptions{})
 	if err != nil {
 		log.Println("Failed to begin transaction", err)
 		return nil, err
 	}
-	
+
 	log.Println("Transaction started")
 
 	defer tx.Rollback(ctx)
