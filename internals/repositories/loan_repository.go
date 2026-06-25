@@ -3,6 +3,7 @@ package repositories
 import (
 	"context"
 	"errors"
+	"log"
 	"time"
 
 	"github.com/Projeto-fullstack-UVA/estante-viva-api/internals/entities"
@@ -52,14 +53,60 @@ func GetLoanByID(ctx context.Context, id int64) (*entities.Loan, error) {
 	return scanLoan(row)
 }
 
-func CreateLoan(ctx context.Context, userID, bookID int64, returnDate time.Time) (int64, error) {
+func CreateLoan(ctx context.Context, userID, bookID int64, returnDate time.Time) (*int64, error) {
 	var id int64
-	err := Pool.QueryRow(ctx,
+
+	log.Println("Beginning transaction to borrow book...")
+	
+	tx, err := Pool.BeginTx(ctx, pgx.TxOptions{})
+	if err != nil {
+		log.Println("Failed to begin transaction", err)
+		return nil, err
+	}
+	
+	log.Println("Transaction started")
+
+	defer tx.Rollback(ctx)
+
+	log.Println("Creating loan's record...")
+	err = tx.QueryRow(ctx,
 		`INSERT INTO loans (user_id, book_id, return_date, returned_at)
 		 VALUES ($1, $2, $3, NULL) RETURNING id`,
 		userID, bookID, returnDate,
 	).Scan(&id)
-	return id, err
+	if err != nil {
+		log.Println("Failed to create loan's record:", err)
+		return nil, err
+	}
+	if id == 0 {
+		log.Println("The book is not available for borrowing")
+		return nil, errors.New("No rows were affected")
+	}
+	log.Println("Created loan's record successfully")
+
+	log.Println("Updating book's status...")
+	result, err := tx.Exec(ctx,
+		`UPDATE books SET status = $1 WHERE id = $2 AND status = 'available'`,
+		"lent", id)
+	if err != nil {
+		log.Println("Failed to update book's status:", err)
+		return nil, err
+	}
+	if result.RowsAffected() == 0 {
+		log.Println("Book not available for borrowing")
+		return nil, errors.New("Book not available for borrowing")
+	}
+	log.Println("Updated book's status successfully")
+
+	log.Println("Committing transaction...")
+	if err := tx.Commit(ctx); err != nil {
+		log.Println("Failed to commit transaction:", err)
+		return nil, err
+	}
+	log.Println("Committed transaction with success")
+
+	log.Println("New loan's id: ", id)
+	return &id, nil
 }
 
 func ReturnLoan(ctx context.Context, id int64) (int64, error) {

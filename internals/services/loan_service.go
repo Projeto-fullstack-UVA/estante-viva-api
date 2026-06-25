@@ -38,37 +38,16 @@ func FindLoan(ctx context.Context, id int64) (*loandto.LoanResponse, error) {
 	return &resp, nil
 }
 
-func BorrowBook(ctx context.Context, userID, bookID int64) (*loandto.LoanResponse, error) {
-	book, err := repositories.GetBookByID(ctx, bookID)
-	if err != nil {
-		log.Println("Error fetching book from the database: ", err)
-		return nil, ErrBookFetchFailed
-	}
-	if book == nil {
-		log.Println("No book with the id ", bookID, " was found in the database")
-		return nil, ErrBookNotFound
-	}
-	if book.Status != "available" {
-		log.Println("This book is not available for borrowing")
-		return nil, ErrBookNotAvailable
-	}
-
-	returnDate := time.Now().AddDate(0, 0, 14)
-
+func BorrowBook(ctx context.Context, userID, bookID int64, returnDate time.Time) (*loandto.LoanResponse, error) {
+	// Create loan with the provided
 	id, err := repositories.CreateLoan(ctx, userID, bookID, returnDate)
 	if err != nil {
 		log.Println("Error creating loan register in the database: ", err.Error())
 		return nil, ErrLoanCreateFailed
 	}
-
-	if err := repositories.UpdateBookStatus(ctx, bookID, "lent"); err != nil {
-		log.Println("Error updating book's status in the database: ", err)
-		return nil, ErrLoanCreateFailed
-	}
-
 	log.Println("Book borrowed with success")
 
-	return FindLoan(ctx, id)
+	return FindLoan(ctx, *id)
 }
 
 func ReturnBook(ctx context.Context, id int64) (*loandto.LoanResponse, error) {

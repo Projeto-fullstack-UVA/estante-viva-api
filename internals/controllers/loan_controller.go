@@ -54,7 +54,7 @@ func BorrowBook(c *gin.Context) {
 		return
 	}
 
-	loan, err := services.BorrowBook(c.Request.Context(), userId, req.BookID)
+	loan, err := services.BorrowBook(c.Request.Context(), userId, req.BookID, req.ReturnDate)
 	if err != nil {
 		switch {
 		case errors.Is(err, services.ErrBookNotFound):

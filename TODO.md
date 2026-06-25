@@ -19,10 +19,6 @@ real spots in the codebase so they can be picked up directly.
 - [ ] **Distinguish duplicate-key errors on register.** `services.Register`
   returns a generic 500 when email/document/cellphone are already taken (unique
   constraints). Detect pgx `23505` and return `409 Conflict` with a clear field.
-- [ ] **Replace `context.Background()` with the request context.** 26 call sites
-  in `repositories/` ignore cancellation/timeouts. Thread `c.Request.Context()`
-  (or a `context.WithTimeout`) from controller → service → repository so slow
-  queries are cancelled when the client disconnects.
 
 ## Security & auth
 
