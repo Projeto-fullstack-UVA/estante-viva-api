@@ -28,4 +28,7 @@ var (
 
 	ErrInstitutionNotFound    = errors.New("Institution not found")
 	ErrInstitutionFetchFailed = errors.New("Error while fetching institution")
+
+	ErrEventNotFound   = errors.New("Event not found")
+	ErrEventListFailed = errors.New("Error while listing events")
 )

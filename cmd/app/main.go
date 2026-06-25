@@ -90,6 +90,8 @@ func main() {
 	router.GET("/loans/:id", middleware.Authentication, controllers.FindLoan)
 	router.GET("/institutions", controllers.ListInstitutions)
 	router.GET("/institutions/:id", middleware.Authentication, controllers.FindInstitution)
+	router.GET("/events", middleware.Authentication, controllers.ListEvents)
+	router.GET("/events/:id", middleware.Authentication, controllers.FindEvent)
 	router.POST("/login", controllers.Login)
 	router.POST("/users", controllers.Register)
 	router.POST("/books", middleware.Authentication, controllers.CreateBook)
