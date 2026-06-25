@@ -43,3 +43,17 @@ func Authentication(c *gin.Context) {
 	c.Set("role", claims["role"])
 	c.Next()
 }
+
+func GetCurrentUserID(c *gin.Context) (int64, bool) {
+	v, ok := c.Get("user_id")
+	if !ok {
+		return 0, false
+	}
+	switch id := v.(type) {
+	case float64:
+		return int64(id), true
+	case int64:
+		return id, true
+	}
+	return 0, false
+}

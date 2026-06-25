@@ -6,6 +6,7 @@ import (
 	"strconv"
 
 	userdto "github.com/Projeto-fullstack-UVA/estante-viva-api/internals/dtos/users"
+	"github.com/Projeto-fullstack-UVA/estante-viva-api/internals/middleware"
 	"github.com/Projeto-fullstack-UVA/estante-viva-api/internals/services"
 	"github.com/gin-gonic/gin"
 )
@@ -45,6 +46,26 @@ func Register(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusCreated, resp)
+}
+
+func GetMe(c *gin.Context) {
+	id, ok := middleware.GetCurrentUserID(c)
+	if !ok {
+		c.String(http.StatusUnauthorized, "Unauthorized")
+		return
+	}
+
+	user, err := services.FindUser(id)
+	if err != nil {
+		if errors.Is(err, services.ErrUserNotFound) {
+			c.String(http.StatusNotFound, "User not found")
+			return
+		}
+		c.String(http.StatusInternalServerError, "Error while finding user")
+		return
+	}
+
+	c.JSON(http.StatusOK, user)
 }
 
 func ListUsers(c *gin.Context) {

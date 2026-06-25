@@ -81,6 +81,7 @@ func main() {
 	router := gin.Default()
 	router.Use(cors())
 
+	router.GET("/me", middleware.Authentication, controllers.GetMe)
 	router.GET("/users", middleware.Authentication, middleware.Authorization("admin"), controllers.ListUsers)
 	router.GET("/users/:id", middleware.Authentication, middleware.Authorization("admin"), controllers.FindUser)
 	router.GET("/books", middleware.Authentication, controllers.ListBooks)
