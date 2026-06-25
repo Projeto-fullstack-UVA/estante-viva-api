@@ -73,14 +73,14 @@ func UpdateBookStatus(ctx context.Context, id int64, status string) error {
 	return err
 }
 
-	func UpdateBook(ctx context.Context, id int64, book entities.Book) (int64, error) {
+func UpdateBook(ctx context.Context, id int64, book entities.Book) (int64, error) {
 	var edition *string
 	if book.Edition != "" {
 		edition = &book.Edition
 	}
 
 	tag, err := Pool.Exec(ctx,
-		`UPDATE books SET title = COALESCE(NULLIF($1, ''), title), 
+		`UPDATE books SET title = COALESCE(NULLIF($1, ''), title),
 		 author = COALESCE(NULLIF($2, ''), author),
 		 release_date = COALESCE(NULLIF($3, '0001-01-01'::timestamp), release_date),
 		 edition = COALESCE(NULLIF($4::text, ''), edition),

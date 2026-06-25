@@ -12,7 +12,6 @@ var AllowedOrigins []string
 var JwtSecretKey string
 var DatabaseURL string
 var Port string
-var GinMode string
 
 func LoadEnvironmentVariables() {
 	if err := godotenv.Load(); err != nil {
@@ -34,11 +33,6 @@ func LoadEnvironmentVariables() {
 	Port = os.Getenv("PORT")
 	if Port == "" {
 		log.Fatalln("Environment variable PORT is not set")
-	}
-
-	GinMode = os.Getenv("GIN_MODE")
-	if GinMode == "" {
-		log.Fatalln("Environment variable GIN_MODE is not set")
 	}
 
 	log.Println("Success loading the environment variables")

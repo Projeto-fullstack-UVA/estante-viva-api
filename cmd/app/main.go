@@ -42,15 +42,6 @@ func main() {
 
 	log.Println("Database connection established with success")
 
-	switch environment.GinMode {
-	case "release":
-		log.Println("Setting gin to release mode")
-		gin.SetMode(gin.ReleaseMode)
-	case "debug":
-		log.Println("Setting gin to debug mode")
-		gin.SetMode(gin.DebugMode)
-	}
-
 	router := gin.Default()
 	router.Use(cors())
 
