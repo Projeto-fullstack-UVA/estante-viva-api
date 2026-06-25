@@ -7,13 +7,13 @@ import (
 )
 
 type BookResponse struct {
-	ID          int64     `json:"id"`
-	Title       string    `json:"title"`
-	Author      string    `json:"author"`
-	ReleaseDate time.Time `json:"release_date"`
-	Edition     string    `json:"edition"`
-	Status      string    `json:"status"`
-	CreatedAt   time.Time `json:"created_at"`
+	ID          int64      `json:"id"`
+	Title       string     `json:"title"`
+	Author      string     `json:"author"`
+	ReleaseDate time.Time  `json:"release_date"`
+	Edition     string     `json:"edition"`
+	Status      string     `json:"status"`
+	CreatedAt   *time.Time `json:"created_at"`
 }
 
 func NewBookResponse(b entities.Book) BookResponse {

@@ -30,7 +30,37 @@ func FindEvent(id int64) (*eventDto.EventResponse, error) {
 	}
 
 	log.Println("Success while fetching event with the provided id")
-	
+
 	result := eventDto.NewEventResponse(*event)
 	return &result, nil
+}
+
+func CreateEvent(event eventDto.CreateEventRequest) error {
+	affected, err := repositories.CreateEvent(event.ToModel())
+	if err != nil {
+		log.Println("Error while creating event in the database: ", err)
+		return ErrCreateEventFailed
+	}
+	if affected == 0 {
+		log.Println("Failed to register event")
+		return ErrCreateEventFailed
+	}
+
+	log.Println("Success creating event in the database")
+	return nil
+}
+
+func DeleteEvent(id int64) error {
+	affected, err := repositories.DeleteEvent(id)
+	if err != nil {
+		log.Println("Error while deleting event in the database: ", err)
+		return ErrDeleteEventFailed
+	}
+	if affected == 0 {
+		log.Println("Failed to delete event in the database")
+		return ErrDeleteEventFailed
+	}
+	
+	log.Println("Event deleted successfully")
+	return nil
 }

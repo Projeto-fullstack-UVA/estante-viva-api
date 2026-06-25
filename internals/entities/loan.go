@@ -10,5 +10,5 @@ type Loan struct {
 	ReturnedAt *time.Time `json:"returned_at"`
 	BookTitle  string     `json:"book_title"`
 	BookAuthor string     `json:"book_author"`
-	CreatedAt  time.Time  `json:"created_at"`
+	CreatedAt  *time.Time `json:"created_at"`
 }

@@ -6,7 +6,6 @@ import (
 	"github.com/Projeto-fullstack-UVA/estante-viva-api/internals/entities"
 )
 
-// UpdateBookRequest is the expected body for PATCH /books/:id.
 type UpdateBookRequest struct {
 	Title       *string    `json:"title"`
 	Author      *string    `json:"author"`

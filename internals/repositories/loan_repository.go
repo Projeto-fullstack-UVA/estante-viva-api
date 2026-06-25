@@ -52,7 +52,6 @@ func GetLoanByID(id int64) (*entities.Loan, error) {
 	return scanLoan(row)
 }
 
-// CreateLoan inserts a loan and returns the id of the newly created row.
 func CreateLoan(userID, bookID int64, returnDate time.Time) (int64, error) {
 	var id int64
 	err := Pool.QueryRow(context.Background(),
@@ -63,10 +62,9 @@ func CreateLoan(userID, bookID int64, returnDate time.Time) (int64, error) {
 	return id, err
 }
 
-// ReturnLoan stamps returned_at and returns the number of rows affected.
-func ReturnLoan(id int64, returnedAt time.Time) (int64, error) {
+func ReturnLoan(id int64) (int64, error) {
 	tag, err := Pool.Exec(context.Background(),
-		`UPDATE loans SET returned_at = $1 WHERE id = $2`, returnedAt, id)
+		`UPDATE loans SET returned_at = $1 WHERE id = $2`, time.Now(), id)
 	if err != nil {
 		return 0, err
 	}

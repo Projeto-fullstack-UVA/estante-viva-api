@@ -1,8 +1,6 @@
 package institutions
 
 import (
-	"time"
-
 	"github.com/Projeto-fullstack-UVA/estante-viva-api/internals/entities"
 )
 
@@ -12,7 +10,6 @@ type InstitutionResponse struct {
 	Abbreviation string    `json:"abbreviation"`
 	City         string    `json:"city"`
 	Address      string    `json:"address"`
-	CreatedAt    time.Time `json:"created_at"`
 }
 
 func NewInstitutionResponse(i entities.Institution) InstitutionResponse {
@@ -22,7 +19,6 @@ func NewInstitutionResponse(i entities.Institution) InstitutionResponse {
 		Abbreviation: i.Abbreviation,
 		City:         i.City,
 		Address:      i.Address,
-		CreatedAt:    i.CreatedAt,
 	}
 }
 

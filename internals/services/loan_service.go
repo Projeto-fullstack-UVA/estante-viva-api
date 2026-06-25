@@ -85,9 +85,7 @@ func ReturnBook(id int64) (*loandto.LoanResponse, error) {
 		return nil, ErrBookAlreadyReturned
 	}
 
-	returnedAt := time.Now()
-
-	affected, err := repositories.ReturnLoan(id, returnedAt)
+	affected, err := repositories.ReturnLoan(id)
 	if err != nil || affected == 0 {
 		log.Println("Error while marking loan as returned in the database")
 		return nil, ErrBookReturnFailed

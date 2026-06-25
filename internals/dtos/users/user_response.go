@@ -28,13 +28,13 @@ type UserResponse struct {
 	Role          string    `json:"role"`
 	InstitutionID *int64    `json:"institution_id"`
 	Score         int16     `json:"score"`
-	CreatedAt     time.Time `json:"created_at"`
+	CreatedAt     *time.Time `json:"created_at"`
 }
 
 func NewRegisterUserResponse(u entities.User) RegisterUserResponse {
 	return RegisterUserResponse{
 		ID:        u.ID,
-		CreatedAt: u.CreatedAt,
+		CreatedAt: *u.CreatedAt,
 	}
 }
 

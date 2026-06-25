@@ -76,7 +76,7 @@ func main() {
 		log.Fatalf("Failed to connect to database: %v", err)
 	}
 
-	log.Println("Database connected")
+	log.Println("Database connection established with success")
 
 	router := gin.Default()
 	router.Use(cors())
@@ -96,14 +96,14 @@ func main() {
 	router.POST("/users", controllers.Register)
 	router.POST("/books", middleware.Authentication, controllers.CreateBook)
 	router.POST("/loans", middleware.Authentication, controllers.BorrowBook)
+	router.POST("/events", middleware.Authentication, middleware.Authorization("admin", "teacher"), controllers.CreateEvent)
 	router.PATCH("/users/:id", middleware.Authentication, middleware.Authorization("admin"), controllers.UpdateUser)
-	router.PATCH("/books/:id", middleware.Authentication, middleware.Authorization("admin"), controllers.UpdateBook)
+	router.PATCH("/books/:id", middleware.Authentication, middleware.Authorization("admin", "teacher"), controllers.UpdateBook)
 	router.PATCH("/loans/:id", middleware.Authentication, middleware.Authorization("admin"), controllers.ReturnBook)
 	router.DELETE("/users/:id", middleware.Authentication, middleware.Authorization("admin"), controllers.DeleteUser)
 	router.DELETE("/books/:id", middleware.Authentication, middleware.Authorization("admin"), controllers.DeleteBook)
 	router.DELETE("/loans/:id", middleware.Authentication, middleware.Authorization("admin"), controllers.DeleteLoan)
-
-	log.Println("Server running on http://localhost:8080")
+	router.DELETE("/events/:id", middleware.Authentication, middleware.Authorization("admin", "teacher"), controllers.DeleteEvent)
 
 	if err := router.Run(":8080"); err != nil {
 		log.Fatalln(err)

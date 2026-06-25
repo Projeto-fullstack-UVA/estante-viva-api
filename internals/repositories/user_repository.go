@@ -3,6 +3,7 @@ package repositories
 import (
 	"context"
 	"errors"
+	"time"
 
 	"github.com/Projeto-fullstack-UVA/estante-viva-api/internals/entities"
 	"github.com/jackc/pgx/v5"
@@ -82,7 +83,7 @@ func CreateUser(user entities.User) (int64, error) {
 		`INSERT INTO users (name, email, password, address, document, cellphone, role, institution_id, score, created_at, birth_date)
 		 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`,
 		user.Name, user.Email, user.Password, user.Address, user.Document,
-		user.Cellphone, user.Role, user.InstitutionID, user.Score, user.CreatedAt, user.BirthDate,
+		user.Cellphone, user.Role, user.InstitutionID, user.Score, time.Now(), user.BirthDate,
 	)
 	if err != nil {
 		return 0, err

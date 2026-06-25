@@ -7,12 +7,12 @@ import (
 )
 
 type EventResponse struct {
-	ID            int64     `json:"id"`
-	Name          string    `json:"name"`
-	Description   string    `json:"description"`
-	Location      string    `json:"location"`
-	InstitutionId int64     `json:"intitution_id"`
-	CreatedAt     time.Time `json:"created_at"`
+	ID            int64      `json:"id"`
+	Name          string     `json:"name"`
+	Description   string     `json:"description"`
+	Location      string     `json:"location"`
+	InstitutionId int64      `json:"intitution_id"`
+	CreatedAt     *time.Time `json:"created_at"`
 }
 
 func NewEventResponse(e entities.Event) EventResponse {
@@ -22,7 +22,7 @@ func NewEventResponse(e entities.Event) EventResponse {
 		Description:   e.Description,
 		Location:      e.Location,
 		InstitutionId: e.InstitutionId,
-		CreatedAt:     e.CreatedAt,
+		CreatedAt: e.CreatedAt,
 	}
 }
 

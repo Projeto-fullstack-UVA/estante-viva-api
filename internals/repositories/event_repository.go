@@ -3,6 +3,7 @@ package repositories
 import (
 	"context"
 	"errors"
+	"time"
 
 	"github.com/Projeto-fullstack-UVA/estante-viva-api/internals/entities"
 	"github.com/jackc/pgx/v5"
@@ -45,4 +46,24 @@ func GetEventById(id int64) (*entities.Event, error) {
 		`SELECT id, name, description, location, institution_id, created_at FROM events
 		WHERE id = $1`, id)
 	return scanEvent(row)
+}
+
+func CreateEvent(event entities.Event) (int64, error) {
+	result, err := Pool.Exec(context.Background(),
+		`INSERT INTO events (name, description, location, institution_id, created_at) VALUES
+		($1, $2, $3, $4, $5)`,
+		event.Name, event.Description, event.Location, event.InstitutionId, time.Now())
+	if err != nil {
+		return 0, err
+	}
+	return result.RowsAffected(), nil
+}
+
+func DeleteEvent(id int64) (int64, error) {
+	result, err := Pool.Exec(context.Background(),
+		`DELETE FROM events WHERE id = $1`, id)
+	if err != nil {
+		return 0, err
+	}
+	return result.RowsAffected(), nil
 }

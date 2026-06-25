@@ -6,7 +6,6 @@ import (
 	"github.com/Projeto-fullstack-UVA/estante-viva-api/internals/entities"
 )
 
-// CreateUserRequest is the expected body for POST /users.
 type CreateUserRequest struct {
 	Name          string    `json:"name" binding:"required"`
 	Email         string    `json:"email" binding:"required"`
@@ -32,6 +31,5 @@ func (r CreateUserRequest) ToModel() entities.User {
 		Role:          r.Role,
 		InstitutionID: r.InstitutionID,
 		Score:         r.Score,
-		CreatedAt:     time.Now(),
 	}
 }

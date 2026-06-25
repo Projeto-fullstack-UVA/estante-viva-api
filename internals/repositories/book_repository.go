@@ -3,6 +3,7 @@ package repositories
 import (
 	"context"
 	"errors"
+	"time"
 
 	"github.com/Projeto-fullstack-UVA/estante-viva-api/internals/entities"
 	"github.com/jackc/pgx/v5"
@@ -59,7 +60,7 @@ func CreateBook(book entities.Book) (int64, error) {
 	tag, err := Pool.Exec(context.Background(),
 		`INSERT INTO books (title, author, release_date, edition, status, created_at)
 		 VALUES ($1, $2, $3, $4, $5, $6)`,
-		book.Title, book.Author, book.ReleaseDate, edition, book.Status, book.CreatedAt,
+		book.Title, book.Author, book.ReleaseDate, edition, book.Status, time.Now(),
 	)
 	if err != nil {
 		return 0, err
