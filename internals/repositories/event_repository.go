@@ -11,7 +11,7 @@ import (
 
 func scanEvent(row pgx.Row) (*entities.Event, error) {
 	var e entities.Event
-	err := row.Scan(&e.ID, &e.Name, &e.Description, &e.Location, &e.InstitutionId, &e.CreatedAt)
+	err := row.Scan(&e.ID, &e.Name, &e.Description, &e.Date, &e.Location, &e.InstitutionId, &e.CreatedAt)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			return nil, nil
@@ -23,7 +23,7 @@ func scanEvent(row pgx.Row) (*entities.Event, error) {
 
 func GetEvents() ([]entities.Event, error) {
 	rows, err := Pool.Query(context.Background(),
-		`SELECT id, name, description, location, institution_id, created_at FROM events`)
+		`SELECT id, name, description, date, location, institution_id, created_at FROM events`)
 	if err != nil {
 		return nil, err
 	}
@@ -43,16 +43,16 @@ func GetEvents() ([]entities.Event, error) {
 
 func GetEventById(id int64) (*entities.Event, error) {
 	row := Pool.QueryRow(context.Background(),
-		`SELECT id, name, description, location, institution_id, created_at FROM events
+		`SELECT id, name, description, date, location, institution_id, created_at FROM events
 		WHERE id = $1`, id)
 	return scanEvent(row)
 }
 
 func CreateEvent(event entities.Event) (int64, error) {
 	result, err := Pool.Exec(context.Background(),
-		`INSERT INTO events (name, description, location, institution_id, created_at) VALUES
-		($1, $2, $3, $4, $5)`,
-		event.Name, event.Description, event.Location, event.InstitutionId, time.Now())
+		`INSERT INTO events (name, description, date, location, institution_id, created_at) VALUES
+		($1, $2, $3, $4, $5, $6)`,
+		event.Name, event.Description, event.Date, event.Location, event.InstitutionId, time.Now())
 	if err != nil {
 		return 0, err
 	}
