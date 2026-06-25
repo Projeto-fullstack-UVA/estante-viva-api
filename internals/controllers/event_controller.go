@@ -10,7 +10,7 @@ import (
 )
 
 func ListEvents(c *gin.Context) {
-	events, err := services.ListEvents()
+	events, err := services.ListEvents(c.Request.Context())
 	if err != nil {
 		c.String(http.StatusInternalServerError, "Error while fetching events")
 		return
@@ -25,7 +25,7 @@ func FindEvent(c *gin.Context) {
 		return
 	}
 
-	event, err := services.FindEvent(id)
+	event, err := services.FindEvent(c.Request.Context(), id)
 	if err != nil {
 		c.String(http.StatusInternalServerError, "Error while fetching event")
 		return
@@ -44,7 +44,7 @@ func CreateEvent(c *gin.Context) {
 		return
 	}
 
-	if err := services.CreateEvent(req); err != nil {
+	if err := services.CreateEvent(c.Request.Context(), req); err != nil {
 		c.String(http.StatusInternalServerError, "Failed to create event")
 		return
 	}
@@ -59,7 +59,7 @@ func DeleteEvent(c *gin.Context) {
 		return
 	}
 	
-	if err := services.DeleteEvent(id); err != nil {
+	if err := services.DeleteEvent(c.Request.Context(), id); err != nil {
 		c.String(http.StatusInternalServerError, "Failed to delete event")
 		return
 	}

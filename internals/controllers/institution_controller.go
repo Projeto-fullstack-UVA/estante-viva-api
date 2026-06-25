@@ -10,7 +10,7 @@ import (
 )
 
 func ListInstitutions(c *gin.Context) {
-	institutions, err := services.ListInstitutions()
+	institutions, err := services.ListInstitutions(c.Request.Context())
 	if err != nil {
 		c.String(http.StatusInternalServerError, "Error while fetching institutions")
 		return
@@ -25,7 +25,7 @@ func FindInstitution(c *gin.Context) {
 		return
 	}
 
-	institution, err := services.FindInstitution(id)
+	institution, err := services.FindInstitution(c.Request.Context(), id)
 	if err != nil {
 		if errors.Is(err, services.ErrInstitutionNotFound) {
 			c.String(http.StatusNotFound, "Institution not found")

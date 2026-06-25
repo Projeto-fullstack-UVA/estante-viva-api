@@ -1,6 +1,7 @@
 package services
 
 import (
+	"context"
 	"log"
 	"time"
 
@@ -8,8 +9,8 @@ import (
 	"github.com/Projeto-fullstack-UVA/estante-viva-api/internals/repositories"
 )
 
-func ListLoans() ([]loandto.LoanResponse, error) {
-	loans, err := repositories.GetLoans()
+func ListLoans(ctx context.Context) ([]loandto.LoanResponse, error) {
+	loans, err := repositories.GetLoans(ctx)
 	if err != nil {
 		log.Println("Error while fetching loans from database", err.Error())
 		return nil, ErrListLoansFailed
@@ -19,8 +20,8 @@ func ListLoans() ([]loandto.LoanResponse, error) {
 	return loandto.NewLoanResponseList(loans), nil
 }
 
-func FindLoan(id int64) (*loandto.LoanResponse, error) {
-	loan, err := repositories.GetLoanByID(id)
+func FindLoan(ctx context.Context, id int64) (*loandto.LoanResponse, error) {
+	loan, err := repositories.GetLoanByID(ctx, id)
 	if err != nil {
 		log.Println("Error while fetching loan from the database: ", err.Error())
 		return nil, ErrLoanFetchFailed
@@ -37,8 +38,8 @@ func FindLoan(id int64) (*loandto.LoanResponse, error) {
 	return &resp, nil
 }
 
-func BorrowBook(userID, bookID int64) (*loandto.LoanResponse, error) {
-	book, err := repositories.GetBookByID(bookID)
+func BorrowBook(ctx context.Context, userID, bookID int64) (*loandto.LoanResponse, error) {
+	book, err := repositories.GetBookByID(ctx, bookID)
 	if err != nil {
 		log.Println("Error fetching book from the database: ", err)
 		return nil, ErrBookFetchFailed
@@ -54,24 +55,24 @@ func BorrowBook(userID, bookID int64) (*loandto.LoanResponse, error) {
 
 	returnDate := time.Now().AddDate(0, 0, 14)
 
-	id, err := repositories.CreateLoan(userID, bookID, returnDate)
+	id, err := repositories.CreateLoan(ctx, userID, bookID, returnDate)
 	if err != nil {
 		log.Println("Error creating loan register in the database: ", err.Error())
 		return nil, ErrLoanCreateFailed
 	}
 
-	if err := repositories.UpdateBookStatus(bookID, "lent"); err != nil {
+	if err := repositories.UpdateBookStatus(ctx, bookID, "lent"); err != nil {
 		log.Println("Error updating book's status in the database: ", err)
 		return nil, ErrLoanCreateFailed
 	}
 
 	log.Println("Book borrowed with success")
 
-	return FindLoan(id)
+	return FindLoan(ctx, id)
 }
 
-func ReturnBook(id int64) (*loandto.LoanResponse, error) {
-	loan, err := repositories.GetLoanByID(id)
+func ReturnBook(ctx context.Context, id int64) (*loandto.LoanResponse, error) {
+	loan, err := repositories.GetLoanByID(ctx, id)
 	if err != nil {
 		log.Println("Failed to fetch book from the database")
 		return nil, ErrLoanNotFound
@@ -85,22 +86,22 @@ func ReturnBook(id int64) (*loandto.LoanResponse, error) {
 		return nil, ErrBookAlreadyReturned
 	}
 
-	affected, err := repositories.ReturnLoan(id)
+	affected, err := repositories.ReturnLoan(ctx, id)
 	if err != nil || affected == 0 {
 		log.Println("Error while marking loan as returned in the database")
 		return nil, ErrBookReturnFailed
 	}
 
-	if err := repositories.UpdateBookStatus(loan.BookID, "available"); err != nil {
+	if err := repositories.UpdateBookStatus(ctx, loan.BookID, "available"); err != nil {
 		log.Println("Error while updating book status in the database: ", err.Error())
 		return nil, ErrBookReturnFailed
 	}
 
-	return FindLoan(id)
+	return FindLoan(ctx, id)
 }
 
-func DeleteLoan(id int64) error {
-	loan, err := repositories.GetLoanByID(id)
+func DeleteLoan(ctx context.Context, id int64) error {
+	loan, err := repositories.GetLoanByID(ctx, id)
 	if err != nil {
 		log.Println("Error while fetching loan from the database: ", err.Error())
 		return ErrLoanFetchFailed
@@ -110,7 +111,7 @@ func DeleteLoan(id int64) error {
 		return ErrLoanNotFound
 	}
 
-	affected, err := repositories.DeleteLoan(id)
+	affected, err := repositories.DeleteLoan(ctx, id)
 	if err != nil {
 		log.Println("Error while deleting loan from the database: ", err.Error())
 		return ErrLoanDeleteFailed
@@ -122,7 +123,7 @@ func DeleteLoan(id int64) error {
 
 	// Release the book if the loan was still active so it isn't stuck as "lent".
 	if loan.ReturnedAt == nil {
-		if err := repositories.UpdateBookStatus(loan.BookID, "available"); err != nil {
+		if err := repositories.UpdateBookStatus(ctx, loan.BookID, "available"); err != nil {
 			log.Println("Error while releasing book after loan deletion: ", err.Error())
 			return ErrLoanDeleteFailed
 		}

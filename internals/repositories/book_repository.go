@@ -27,8 +27,8 @@ func scanBook(row pgx.Row) (*entities.Book, error) {
 	return &b, nil
 }
 
-func GetBooks() ([]entities.Book, error) {
-	rows, err := Pool.Query(context.Background(),
+func GetBooks(ctx context.Context) ([]entities.Book, error) {
+	rows, err := Pool.Query(ctx,
 		`SELECT id, title, author, release_date, edition, status, created_at FROM books ORDER BY id`)
 	if err != nil {
 		return nil, err
@@ -46,18 +46,18 @@ func GetBooks() ([]entities.Book, error) {
 	return books, rows.Err()
 }
 
-func GetBookByID(id int64) (*entities.Book, error) {
-	row := Pool.QueryRow(context.Background(),
+func GetBookByID(ctx context.Context, id int64) (*entities.Book, error) {
+	row := Pool.QueryRow(ctx,
 		`SELECT id, title, author, release_date, edition, status, created_at FROM books WHERE id = $1`, id)
 	return scanBook(row)
 }
 
-func CreateBook(book entities.Book) (int64, error) {
+func CreateBook(ctx context.Context, book entities.Book) (int64, error) {
 	var edition *string
 	if book.Edition != "" {
 		edition = &book.Edition
 	}
-	tag, err := Pool.Exec(context.Background(),
+	tag, err := Pool.Exec(ctx,
 		`INSERT INTO books (title, author, release_date, edition, status, created_at)
 		 VALUES ($1, $2, $3, $4, $5, $6)`,
 		book.Title, book.Author, book.ReleaseDate, edition, book.Status, time.Now(),
@@ -68,17 +68,18 @@ func CreateBook(book entities.Book) (int64, error) {
 	return tag.RowsAffected(), nil
 }
 
-func UpdateBookStatus(id int64, status string) error {
-	_, err := Pool.Exec(context.Background(), `UPDATE books SET status = $1 WHERE id = $2`, status, id)
+func UpdateBookStatus(ctx context.Context, id int64, status string) error {
+	_, err := Pool.Exec(ctx, `UPDATE books SET status = $1 WHERE id = $2`, status, id)
 	return err
 }
 
-func UpdateBook(id int64, book entities.Book) (int64, error) {
+	func UpdateBook(ctx context.Context, id int64, book entities.Book) (int64, error) {
 	var edition *string
 	if book.Edition != "" {
 		edition = &book.Edition
 	}
-	tag, err := Pool.Exec(context.Background(),
+
+	tag, err := Pool.Exec(ctx,
 		`UPDATE books SET title = COALESCE(NULLIF($1, ''), title), 
 		 author = COALESCE(NULLIF($2, ''), author),
 		 release_date = COALESCE(NULLIF($3, '0001-01-01'::timestamp), release_date),
@@ -93,8 +94,8 @@ func UpdateBook(id int64, book entities.Book) (int64, error) {
 	return tag.RowsAffected(), nil
 }
 
-func DeleteBook(id int64) (int64, error) {
-	tag, err := Pool.Exec(context.Background(), `DELETE FROM books WHERE id = $1`, id)
+func DeleteBook(ctx context.Context, id int64) (int64, error) {
+	tag, err := Pool.Exec(ctx, `DELETE FROM books WHERE id = $1`, id)
 	if err != nil {
 		return 0, err
 	}

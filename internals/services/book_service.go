@@ -1,14 +1,15 @@
 package services
 
 import (
+	"context"
 	"log"
 
 	bookDto "github.com/Projeto-fullstack-UVA/estante-viva-api/internals/dtos/books"
 	"github.com/Projeto-fullstack-UVA/estante-viva-api/internals/repositories"
 )
 
-func ListBooks() ([]bookDto.BookResponse, error) {
-	books, err := repositories.GetBooks()
+func ListBooks(ctx context.Context) ([]bookDto.BookResponse, error) {
+	books, err := repositories.GetBooks(ctx)
 	if err != nil {
 		log.Println("Error while fetching books from the database: ", err.Error())
 		return nil, ErrListBooksFailed
@@ -19,8 +20,8 @@ func ListBooks() ([]bookDto.BookResponse, error) {
 	return bookDto.NewBookResponseList(books), nil
 }
 
-func FindBook(id int64) (*bookDto.BookResponse, error) {
-	book, err := repositories.GetBookByID(id)
+func FindBook(ctx context.Context, id int64) (*bookDto.BookResponse, error) {
+	book, err := repositories.GetBookByID(ctx, id)
 	if err != nil {
 		log.Println("Error while fetching book from the database: ", err.Error())
 		return nil, ErrBookFetchFailed
@@ -37,8 +38,8 @@ func FindBook(id int64) (*bookDto.BookResponse, error) {
 	return &resp, nil
 }
 
-func CreateBook(req bookDto.CreateBookRequest) error {
-	affected, err := repositories.CreateBook(req.ToModel())
+func CreateBook(ctx context.Context, req bookDto.CreateBookRequest) error {
+	affected, err := repositories.CreateBook(ctx, req.ToModel())
 	if err != nil {
 		log.Println("Error while creating book in the database: ", err.Error())
 		return ErrBookCreateFailed
@@ -53,8 +54,8 @@ func CreateBook(req bookDto.CreateBookRequest) error {
 	return nil
 }
 
-func DeleteBook(id int64) error {
-	affected, err := repositories.DeleteBook(id)
+func DeleteBook(ctx context.Context, id int64) error {
+	affected, err := repositories.DeleteBook(ctx, id)
 	if err != nil {
 		log.Println("Error while deleting book from the database: ", err.Error())
 		return ErrBookDeleteFailed
@@ -69,9 +70,9 @@ func DeleteBook(id int64) error {
 	return nil
 }
 
-func UpdateBook(id int64, req bookDto.UpdateBookRequest) error {
+func UpdateBook(ctx context.Context, id int64, req bookDto.UpdateBookRequest) error {
 	book := req.ToModel()
-	affected, err := repositories.UpdateBook(id, book)
+	affected, err := repositories.UpdateBook(ctx, id, book)
 	if err != nil {
 		log.Println("Error while updating book in the database: ", err.Error())
 		return ErrBookUpdateFailed

@@ -91,8 +91,8 @@ func CreateUser(ctx context.Context, user entities.User) (int64, error) {
 	return tag.RowsAffected(), nil
 }
 
-func UpdateUserPassword(id int64, password string) error {
-	_, err := Pool.Exec(context.Background(),
+func UpdateUserPassword(ctx context.Context, id int64, password string) error {
+	_, err := Pool.Exec(ctx,
 		`UPDATE users SET password = $1 WHERE id = $2`,
 		password, id,
 	)
@@ -100,7 +100,7 @@ func UpdateUserPassword(id int64, password string) error {
 }
 
 func DeleteUser(ctx context.Context, id int64) (int64, error) {
-	tag, err := Pool.Exec(context.Background(), `DELETE FROM users WHERE id = $1`, id)
+	tag, err := Pool.Exec(ctx, `DELETE FROM users WHERE id = $1`, id)
 	if err != nil {
 		return 0, err
 	}
@@ -108,7 +108,7 @@ func DeleteUser(ctx context.Context, id int64) (int64, error) {
 }
 
 func UpdateUser(ctx context.Context, id int64, user entities.User) (int64, error) {
-	tag, err := Pool.Exec(context.Background(),
+	tag, err := Pool.Exec(ctx,
 		`UPDATE users SET name = COALESCE(NULLIF($1, ''), name),
 		 email = COALESCE(NULLIF($2, ''), email),
 		 address = COALESCE(NULLIF($3, ''), address),

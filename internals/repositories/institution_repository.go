@@ -21,8 +21,8 @@ func scanInstitution(row pgx.Row) (*entities.Institution, error) {
 	return &i, nil
 }
 
-func GetInstitutions() ([]entities.Institution, error) {
-	rows, err := Pool.Query(context.Background(),
+func GetInstitutions(ctx context.Context) ([]entities.Institution, error) {
+	rows, err := Pool.Query(ctx,
 		`SELECT id, name, abbreviation, city, address, created_at FROM institutions ORDER BY id`)
 	if err != nil {
 		return nil, err
@@ -40,8 +40,8 @@ func GetInstitutions() ([]entities.Institution, error) {
 	return institutions, rows.Err()
 }
 
-func GetInstitutionById(id int64) (*entities.Institution, error) {
-	row := Pool.QueryRow(context.Background(),
+func GetInstitutionById(ctx context.Context, id int64) (*entities.Institution, error) {
+	row := Pool.QueryRow(ctx,
 		`SELECT id, name, abbreviation, city, address, created_at FROM institutions
 		WHERE id = $1`, id)
 	return scanInstitution(row)

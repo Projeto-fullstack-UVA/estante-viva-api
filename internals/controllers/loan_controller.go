@@ -12,7 +12,7 @@ import (
 )
 
 func ListLoans(c *gin.Context) {
-	loans, err := services.ListLoans()
+	loans, err := services.ListLoans(c.Request.Context())
 	if err != nil {
 		c.String(http.StatusInternalServerError, "Error while returning the loan's list")
 		return
@@ -28,7 +28,7 @@ func FindLoan(c *gin.Context) {
 		return
 	}
 
-	loan, err := services.FindLoan(id)
+	loan, err := services.FindLoan(c.Request.Context(), id)
 	if err != nil {
 		if errors.Is(err, services.ErrLoanNotFound) {
 			c.String(http.StatusNotFound, "Loan not found")
@@ -54,7 +54,7 @@ func BorrowBook(c *gin.Context) {
 		return
 	}
 
-	loan, err := services.BorrowBook(userId, req.BookID)
+	loan, err := services.BorrowBook(c.Request.Context(), userId, req.BookID)
 	if err != nil {
 		switch {
 		case errors.Is(err, services.ErrBookNotFound):
@@ -77,7 +77,7 @@ func ReturnBook(c *gin.Context) {
 		return
 	}
 
-	loan, err := services.ReturnBook(id)
+	loan, err := services.ReturnBook(c.Request.Context(), id)
 	if err != nil {
 		switch {
 		case errors.Is(err, services.ErrLoanNotFound):
@@ -100,7 +100,7 @@ func DeleteLoan(c *gin.Context) {
 		return
 	}
 
-	if err := services.DeleteLoan(id); err != nil {
+	if err := services.DeleteLoan(c.Request.Context(), id); err != nil {
 		if errors.Is(err, services.ErrLoanNotFound) {
 			c.String(http.StatusNotFound, "Loan not found")
 			return

@@ -1,6 +1,7 @@
 package services
 
 import (
+	"context"
 	"errors"
 	"log"
 
@@ -8,8 +9,8 @@ import (
 	"github.com/Projeto-fullstack-UVA/estante-viva-api/internals/repositories"
 )
 
-func ListInstitutions() ([]institutionDto.InstitutionResponse, error) {
-	institutions, err := repositories.GetInstitutions()
+func ListInstitutions(ctx context.Context) ([]institutionDto.InstitutionResponse, error) {
+	institutions, err := repositories.GetInstitutions(ctx)
 	if err != nil {
 		log.Println("Error while fetching institutions from the database: ", err.Error())
 		return nil, errors.New("Failed to get institutions")
@@ -19,8 +20,8 @@ func ListInstitutions() ([]institutionDto.InstitutionResponse, error) {
 	return institutionDto.NewInstitutionResponseList(institutions), nil
 }
 
-func FindInstitution(id int64) (*institutionDto.InstitutionResponse, error) {
-	institution, err := repositories.GetInstitutionById(id)
+func FindInstitution(ctx context.Context, id int64) (*institutionDto.InstitutionResponse, error) {
+	institution, err := repositories.GetInstitutionById(ctx, id)
 	if err != nil {
 		log.Println("Error while fetching institution by id: ", err.Error())
 		return nil, ErrInstitutionFetchFailed

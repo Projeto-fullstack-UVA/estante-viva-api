@@ -29,8 +29,8 @@ func scanLoan(row pgx.Row) (*entities.Loan, error) {
 	return &l, nil
 }
 
-func GetLoans() ([]entities.Loan, error) {
-	rows, err := Pool.Query(context.Background(), loanSelect+" ORDER BY l.id")
+func GetLoans(ctx context.Context) ([]entities.Loan, error) {
+	rows, err := Pool.Query(ctx, loanSelect+" ORDER BY l.id")
 	if err != nil {
 		return nil, err
 	}
@@ -47,14 +47,14 @@ func GetLoans() ([]entities.Loan, error) {
 	return loans, rows.Err()
 }
 
-func GetLoanByID(id int64) (*entities.Loan, error) {
-	row := Pool.QueryRow(context.Background(), loanSelect+" WHERE l.id = $1", id)
+func GetLoanByID(ctx context.Context, id int64) (*entities.Loan, error) {
+	row := Pool.QueryRow(ctx, loanSelect+" WHERE l.id = $1", id)
 	return scanLoan(row)
 }
 
-func CreateLoan(userID, bookID int64, returnDate time.Time) (int64, error) {
+func CreateLoan(ctx context.Context, userID, bookID int64, returnDate time.Time) (int64, error) {
 	var id int64
-	err := Pool.QueryRow(context.Background(),
+	err := Pool.QueryRow(ctx,
 		`INSERT INTO loans (user_id, book_id, return_date, returned_at)
 		 VALUES ($1, $2, $3, NULL) RETURNING id`,
 		userID, bookID, returnDate,
@@ -62,8 +62,8 @@ func CreateLoan(userID, bookID int64, returnDate time.Time) (int64, error) {
 	return id, err
 }
 
-func ReturnLoan(id int64) (int64, error) {
-	tag, err := Pool.Exec(context.Background(),
+func ReturnLoan(ctx context.Context, id int64) (int64, error) {
+	tag, err := Pool.Exec(ctx,
 		`UPDATE loans SET returned_at = $1 WHERE id = $2`, time.Now(), id)
 	if err != nil {
 		return 0, err
@@ -71,8 +71,8 @@ func ReturnLoan(id int64) (int64, error) {
 	return tag.RowsAffected(), nil
 }
 
-func DeleteLoan(id int64) (int64, error) {
-	tag, err := Pool.Exec(context.Background(), `DELETE FROM loans WHERE id = $1`, id)
+func DeleteLoan(ctx context.Context, id int64) (int64, error) {
+	tag, err := Pool.Exec(ctx, `DELETE FROM loans WHERE id = $1`, id)
 	if err != nil {
 		return 0, err
 	}

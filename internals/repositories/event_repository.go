@@ -21,8 +21,8 @@ func scanEvent(row pgx.Row) (*entities.Event, error) {
 	return &e, nil
 }
 
-func GetEvents() ([]entities.Event, error) {
-	rows, err := Pool.Query(context.Background(),
+func GetEvents(ctx context.Context) ([]entities.Event, error) {
+	rows, err := Pool.Query(ctx,
 		`SELECT id, name, description, date, location, institution_id, created_at FROM events`)
 	if err != nil {
 		return nil, err
@@ -41,15 +41,15 @@ func GetEvents() ([]entities.Event, error) {
 	return events, rows.Err()
 }
 
-func GetEventById(id int64) (*entities.Event, error) {
-	row := Pool.QueryRow(context.Background(),
+func GetEventById(ctx context.Context, id int64) (*entities.Event, error) {
+	row := Pool.QueryRow(ctx,
 		`SELECT id, name, description, date, location, institution_id, created_at FROM events
 		WHERE id = $1`, id)
 	return scanEvent(row)
 }
 
-func CreateEvent(event entities.Event) (int64, error) {
-	result, err := Pool.Exec(context.Background(),
+func CreateEvent(ctx context.Context, event entities.Event) (int64, error) {
+	result, err := Pool.Exec(ctx,
 		`INSERT INTO events (name, description, date, location, institution_id, created_at) VALUES
 		($1, $2, $3, $4, $5, $6)`,
 		event.Name, event.Description, event.Date, event.Location, event.InstitutionId, time.Now())
@@ -59,8 +59,8 @@ func CreateEvent(event entities.Event) (int64, error) {
 	return result.RowsAffected(), nil
 }
 
-func DeleteEvent(id int64) (int64, error) {
-	result, err := Pool.Exec(context.Background(),
+func DeleteEvent(ctx context.Context, id int64) (int64, error) {
+	result, err := Pool.Exec(ctx,
 		`DELETE FROM events WHERE id = $1`, id)
 	if err != nil {
 		return 0, err

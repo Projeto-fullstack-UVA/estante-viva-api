@@ -11,7 +11,7 @@ import (
 )
 
 func ListBooks(c *gin.Context) {
-	books, err := services.ListBooks()
+	books, err := services.ListBooks(c.Request.Context())
 	if err != nil {
 		c.String(http.StatusInternalServerError, "Error while returning the book's list")
 		return
@@ -27,7 +27,7 @@ func FindBook(c *gin.Context) {
 		return
 	}
 
-	book, err := services.FindBook(id)
+	book, err := services.FindBook(c.Request.Context(), id)
 	if err != nil {
 		if errors.Is(err, services.ErrBookNotFound) {
 			c.String(http.StatusNotFound, "Book not found")
@@ -47,7 +47,7 @@ func CreateBook(c *gin.Context) {
 		return
 	}
 
-	if err := services.CreateBook(req); err != nil {
+	if err := services.CreateBook(c.Request.Context(), req); err != nil {
 		c.String(http.StatusInternalServerError, "Error while creating book")
 		return
 	}
@@ -62,7 +62,7 @@ func DeleteBook(c *gin.Context) {
 		return
 	}
 
-	if err := services.DeleteBook(id); err != nil {
+	if err := services.DeleteBook(c.Request.Context(), id); err != nil {
 		if errors.Is(err, services.ErrBookNotFound) {
 			c.String(http.StatusNotFound, "Book not found")
 			return
@@ -87,7 +87,7 @@ func UpdateBook(c *gin.Context) {
 		return
 	}
 
-	if err := services.UpdateBook(id, req); err != nil {
+	if err := services.UpdateBook(c.Request.Context(), id, req); err != nil {
 		if errors.Is(err, services.ErrBookNotFound) {
 			c.String(http.StatusNotFound, "Book not found")
 			return

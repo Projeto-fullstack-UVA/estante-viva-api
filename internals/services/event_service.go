@@ -1,14 +1,15 @@
 package services
 
 import (
+	"context"
 	"log"
 
 	eventDto "github.com/Projeto-fullstack-UVA/estante-viva-api/internals/dtos/events"
 	"github.com/Projeto-fullstack-UVA/estante-viva-api/internals/repositories"
 )
 
-func ListEvents() ([]eventDto.EventResponse, error) {
-	events, err := repositories.GetEvents()
+func ListEvents(ctx context.Context) ([]eventDto.EventResponse, error) {
+	events, err := repositories.GetEvents(ctx)
 	if err != nil {
 		log.Println("Error while fetching events from the database: ", err)
 		return nil, ErrEventListFailed
@@ -18,8 +19,8 @@ func ListEvents() ([]eventDto.EventResponse, error) {
 	return eventDto.NewEventResponseList(events), nil
 }
 
-func FindEvent(id int64) (*eventDto.EventResponse, error) {
-	event, err := repositories.GetEventById(id)
+func FindEvent(ctx context.Context, id int64) (*eventDto.EventResponse, error) {
+	event, err := repositories.GetEventById(ctx, id)
 	if err != nil {
 		log.Println("Error while fetching event from the database: ", err)
 		return nil, err
@@ -35,8 +36,8 @@ func FindEvent(id int64) (*eventDto.EventResponse, error) {
 	return &result, nil
 }
 
-func CreateEvent(event eventDto.CreateEventRequest) error {
-	affected, err := repositories.CreateEvent(event.ToModel())
+func CreateEvent(ctx context.Context, event eventDto.CreateEventRequest) error {
+	affected, err := repositories.CreateEvent(ctx, event.ToModel())
 	if err != nil {
 		log.Println("Error while creating event in the database: ", err)
 		return ErrCreateEventFailed
@@ -50,8 +51,8 @@ func CreateEvent(event eventDto.CreateEventRequest) error {
 	return nil
 }
 
-func DeleteEvent(id int64) error {
-	affected, err := repositories.DeleteEvent(id)
+func DeleteEvent(ctx context.Context, id int64) error {
+	affected, err := repositories.DeleteEvent(ctx, id)
 	if err != nil {
 		log.Println("Error while deleting event in the database: ", err)
 		return ErrDeleteEventFailed
