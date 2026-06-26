@@ -10,8 +10,6 @@ import (
 	"github.com/jackc/pgx/v5"
 )
 
-// Repository-level sentinel errors so callers can map them to the right
-// response without the repositories package depending on services.
 var (
 	ErrLoanNotFound        = errors.New("loan not found")
 	ErrLoanAlreadyReturned = errors.New("loan already returned")

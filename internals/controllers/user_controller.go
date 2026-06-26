@@ -8,136 +8,137 @@ import (
 	userdto "github.com/Projeto-fullstack-UVA/estante-viva-api/internals/dtos/users"
 	"github.com/Projeto-fullstack-UVA/estante-viva-api/internals/middleware"
 	"github.com/Projeto-fullstack-UVA/estante-viva-api/internals/services"
+	"github.com/Projeto-fullstack-UVA/estante-viva-api/internals/utils"
 	"github.com/gin-gonic/gin"
 )
 
 func Login(c *gin.Context) {
 	var req userdto.LoginRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.String(http.StatusBadRequest, "Invalid credentials format")
+		utils.Fail(c, http.StatusBadRequest, "INVALID_CREDENTIALS", "Invalid credentials format")
 		return
 	}
 
 	user, err := services.Login(c.Request.Context(), req.Email, req.Password)
 	if err != nil {
 		if errors.Is(err, services.ErrUserNotFound) {
-			c.String(http.StatusUnauthorized, "Invalid email or password")
+			utils.Fail(c, http.StatusUnauthorized, "INVALID_CREDENTIALS", "Invalid email or password")
 			return
 		}
-		c.String(http.StatusInternalServerError, "Error while logging in")
+		utils.Fail(c, http.StatusInternalServerError, "INTERNAL_ERROR", "Error while logging in")
 		return
 	}
 
 	c.Header("Authorization", user.Token)
-	c.JSON(http.StatusOK, user)
+	utils.OK(c, http.StatusOK, user)
 }
 
 func Register(c *gin.Context) {
 	var req userdto.CreateUserRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.String(http.StatusBadRequest, "Invalid user format")
+		utils.Fail(c, http.StatusBadRequest, "INVALID_PAYLOAD", "Invalid user format")
 		return
 	}
 
 	resp, err := services.Register(c.Request.Context(), req)
 	if err != nil {
-		c.String(http.StatusInternalServerError, "Error while creating user")
+		utils.Fail(c, http.StatusInternalServerError, "INTERNAL_ERROR", "Error while creating user")
 		return
 	}
 
-	c.JSON(http.StatusCreated, resp)
+	utils.OK(c, http.StatusCreated, resp)
 }
 
 func GetMe(c *gin.Context) {
 	id, ok := middleware.GetCurrentUserID(c)
 	if !ok {
-		c.String(http.StatusUnauthorized, "Unauthorized")
+		utils.Fail(c, http.StatusUnauthorized, "UNAUTHORIZED", "Unauthorized")
 		return
 	}
 
 	user, err := services.FindUser(c.Request.Context(), id)
 	if err != nil {
 		if errors.Is(err, services.ErrUserNotFound) {
-			c.String(http.StatusNotFound, "User not found")
+			utils.Fail(c, http.StatusNotFound, "USER_NOT_FOUND", "User not found")
 			return
 		}
-		c.String(http.StatusInternalServerError, "Error while finding user")
+		utils.Fail(c, http.StatusInternalServerError, "INTERNAL_ERROR", "Error while finding user")
 		return
 	}
 
-	c.JSON(http.StatusOK, user)
+	utils.OK(c, http.StatusOK, user)
 }
 
 func ListUsers(c *gin.Context) {
 	users, err := services.ListUsers(c.Request.Context())
 	if err != nil {
-		c.String(http.StatusInternalServerError, "Error while returning the user's list")
+		utils.Fail(c, http.StatusInternalServerError, "INTERNAL_ERROR", "Error while returning the user's list")
 		return
 	}
 
-	c.JSON(http.StatusOK, users)
+	utils.OK(c, http.StatusOK, users)
 }
 
 func FindUser(c *gin.Context) {
 	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
 	if err != nil {
-		c.String(http.StatusBadRequest, "Invalid ID")
+		utils.Fail(c, http.StatusBadRequest, "INVALID_ID", "Invalid ID")
 		return
 	}
 
 	user, err := services.FindUser(c.Request.Context(), id)
 	if err != nil {
 		if errors.Is(err, services.ErrUserNotFound) {
-			c.String(http.StatusNotFound, "User not found")
+			utils.Fail(c, http.StatusNotFound, "USER_NOT_FOUND", "User not found")
 			return
 		}
-		c.String(http.StatusInternalServerError, "Error while finding user")
+		utils.Fail(c, http.StatusInternalServerError, "INTERNAL_ERROR", "Error while finding user")
 		return
 	}
 
-	c.JSON(http.StatusOK, user)
+	utils.OK(c, http.StatusOK, user)
 }
 
 func UpdateUser(c *gin.Context) {
 	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
 	if err != nil {
-		c.String(http.StatusBadRequest, "Invalid ID")
+		utils.Fail(c, http.StatusBadRequest, "INVALID_ID", "Invalid ID")
 		return
 	}
 
 	var req userdto.UpdateUserRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.String(http.StatusBadRequest, "Invalid user format")
+		utils.Fail(c, http.StatusBadRequest, "INVALID_PAYLOAD", "Invalid user format")
 		return
 	}
 
 	if err := services.UpdateUser(c.Request.Context(), id, req); err != nil {
 		if errors.Is(err, services.ErrUserNotFound) {
-			c.String(http.StatusNotFound, "User not found")
+			utils.Fail(c, http.StatusNotFound, "USER_NOT_FOUND", "User not found")
 			return
 		}
-		c.String(http.StatusInternalServerError, "Error while updating user")
+		utils.Fail(c, http.StatusInternalServerError, "INTERNAL_ERROR", "Error while updating user")
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "User updated successfully", "success": true})
+	utils.OK(c, http.StatusOK, gin.H{"message": "User updated successfully"})
 }
 
 func DeleteUser(c *gin.Context) {
 	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
 	if err != nil {
-		c.String(http.StatusBadRequest, "Invalid ID")
+		utils.Fail(c, http.StatusBadRequest, "INVALID_ID", "Invalid ID")
 		return
 	}
 
 	if err := services.DeleteUser(c.Request.Context(), id); err != nil {
 		if errors.Is(err, services.ErrUserNotFound) {
-			c.String(http.StatusNotFound, "User not found")
+			utils.Fail(c, http.StatusNotFound, "USER_NOT_FOUND", "User not found")
 			return
 		}
-		c.String(http.StatusInternalServerError, "Error while deleting user")
+		utils.Fail(c, http.StatusInternalServerError, "INTERNAL_ERROR", "Error while deleting user")
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "User deleted successfully", "success": true})
+	utils.OK(c, http.StatusOK, gin.H{"message": "User deleted successfully"})
 }
