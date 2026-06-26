@@ -12,7 +12,7 @@ type EventResponse struct {
 	Description   string     `json:"description"`
 	Date          time.Time  `json:"date"`
 	Location      string     `json:"location"`
-	InstitutionId int64      `json:"intitution_id"`
+	InstitutionId int64      `json:"institution_id"`
 	CreatedAt     *time.Time `json:"created_at"`
 }
 

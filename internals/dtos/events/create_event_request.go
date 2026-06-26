@@ -11,7 +11,7 @@ type CreateEventRequest struct {
 	Description   string    `json:"description" binding:"required"`
 	Date          time.Time `json:"date" binding:"required"`
 	Location      string    `json:"location" binding:"required"`
-	InstitutionId int64     `json:"institution_id" binding:"required, number"`
+	InstitutionId int64     `json:"institution_id" binding:"required,number"`
 }
 
 func (r CreateEventRequest) ToModel() entities.Event {
