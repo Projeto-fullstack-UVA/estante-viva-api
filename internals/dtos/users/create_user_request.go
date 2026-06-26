@@ -11,10 +11,10 @@ type CreateUserRequest struct {
 	Email         string    `json:"email" binding:"required"`
 	BirthDate     time.Time `json:"birthDate" binding:"required"`
 	Password      string    `json:"password" binding:"required"`
-	Address       string    `json:"address"`
-	Document      string    `json:"document"`
-	Cellphone     string    `json:"cellphone"`
-	Role          string    `json:"role" binding:"required,oneof=student teacher admin"`
+	Address       string    `json:"address" binding:"required"`
+	Document      string    `json:"document" binding:"required"`
+	Cellphone     string    `json:"cellphone" binding:"required"`
+	Role          string    `json:"role" binding:"required,oneof=student teacher"`
 	InstitutionID *int64    `json:"institution_id"`
 	Score         int16     `json:"score"`
 }
