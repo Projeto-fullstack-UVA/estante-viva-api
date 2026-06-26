@@ -40,7 +40,7 @@ func main() {
 	router.POST("/events", middleware.Authentication, middleware.Authorization("admin", "teacher"), controllers.CreateEvent)
 	router.PATCH("/users/:id", middleware.Authentication, middleware.Authorization("admin"), controllers.UpdateUser)
 	router.PATCH("/books/:id", middleware.Authentication, middleware.Authorization("admin", "teacher"), controllers.UpdateBook)
-	router.PATCH("/loans/:id", middleware.Authentication, middleware.Authorization("admin"), controllers.ReturnBook)
+	router.PATCH("/loans/:id", middleware.Authentication, controllers.ReturnBook)
 	router.DELETE("/users/:id", middleware.Authentication, middleware.Authorization("admin"), controllers.DeleteUser)
 	router.DELETE("/books/:id", middleware.Authentication, middleware.Authorization("admin"), controllers.DeleteBook)
 	router.DELETE("/loans/:id", middleware.Authentication, middleware.Authorization("admin"), controllers.DeleteLoan)
