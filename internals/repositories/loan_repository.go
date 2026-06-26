@@ -87,7 +87,7 @@ func CreateLoan(ctx context.Context, userID, bookID int64, returnDate time.Time)
 	log.Println("Updating book's status...")
 	result, err := tx.Exec(ctx,
 		`UPDATE books SET status = $1 WHERE id = $2 AND status = 'available'`,
-		"lent", id)
+		"lent", bookID)
 	if err != nil {
 		log.Println("Failed to update book's status:", err)
 		return nil, err
