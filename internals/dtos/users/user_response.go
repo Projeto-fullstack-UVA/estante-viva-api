@@ -1,6 +1,8 @@
 package users
 
 import (
+	"time"
+
 	"github.com/Projeto-fullstack-UVA/estante-viva-api/internals/auth"
 	"github.com/Projeto-fullstack-UVA/estante-viva-api/internals/entities"
 )
@@ -25,6 +27,7 @@ type UserResponse struct {
 	Role          string    `json:"role"`
 	InstitutionID *int64    `json:"institution_id"`
 	Score         int16     `json:"score"`
+	CreatedAt     time.Time `json:"created_at"`
 }
 
 func NewRegisterUserResponse(u entities.User) RegisterUserResponse {
@@ -46,6 +49,7 @@ func NewListUserResponse(list []entities.User) []UserResponse {
 			Role:          u.Role,
 			InstitutionID: u.InstitutionID,
 			Score:         u.Score,
+			CreatedAt:     *u.CreatedAt,
 		})
 	}
 	return out
