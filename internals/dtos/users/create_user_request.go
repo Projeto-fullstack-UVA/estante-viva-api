@@ -8,12 +8,12 @@ import (
 
 type CreateUserRequest struct {
 	Name          string    `json:"name" binding:"required"`
-	Email         string    `json:"email" binding:"required"`
+	Email         string    `json:"email" binding:"required,email"`
 	BirthDate     time.Time `json:"birthDate" binding:"required"`
 	Password      string    `json:"password" binding:"required"`
 	Address       string    `json:"address" binding:"required"`
-	Document      string    `json:"document" binding:"required"`
-	Cellphone     string    `json:"cellphone" binding:"required"`
+	Document      string    `json:"document" binding:"required,min=11,max=11,number"`
+	Cellphone     string    `json:"cellphone" binding:"required,min=11,max=11,number"`
 	Role          string    `json:"role" binding:"required,oneof=student teacher"`
 	InstitutionID *int64    `json:"institution_id"`
 	Score         int16     `json:"score"`
