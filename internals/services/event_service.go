@@ -51,6 +51,21 @@ func CreateEvent(ctx context.Context, event eventDto.CreateEventRequest) error {
 	return nil
 }
 
+func UpdateEvent(ctx context.Context, id int64, req eventDto.UpdateEventRequest) error {
+	affected, err := repositories.UpdateEvent(ctx, id, req.ToModel())
+	if err != nil {
+		log.Println("Error while updating event in the database: ", err)
+		return ErrUpdateEventFailed
+	}
+	if affected == 0 {
+		log.Println("No event with the id ", id, " found to update")
+		return ErrEventNotFound
+	}
+
+	log.Println("Success updating event in the database")
+	return nil
+}
+
 func DeleteEvent(ctx context.Context, id int64) error {
 	affected, err := repositories.DeleteEvent(ctx, id)
 	if err != nil {

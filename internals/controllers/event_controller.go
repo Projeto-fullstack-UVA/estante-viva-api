@@ -54,6 +54,31 @@ func CreateEvent(c *gin.Context) {
 	utils.OK(c, http.StatusCreated, gin.H{"message": "Created event successfully"})
 }
 
+func UpdateEvent(c *gin.Context) {
+	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
+	if err != nil {
+		utils.Fail(c, http.StatusBadRequest, "INVALID_ID", "Invalid ID")
+		return
+	}
+
+	var req eventdto.UpdateEventRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		utils.Fail(c, http.StatusBadRequest, "INVALID_PAYLOAD", "Invalid event format")
+		return
+	}
+
+	if err := services.UpdateEvent(c.Request.Context(), id, req); err != nil {
+		if errors.Is(err, services.ErrEventNotFound) {
+			utils.Fail(c, http.StatusNotFound, "EVENT_NOT_FOUND", "Event not found")
+			return
+		}
+		utils.Fail(c, http.StatusInternalServerError, "INTERNAL_ERROR", "Failed to update event")
+		return
+	}
+
+	utils.OK(c, http.StatusOK, gin.H{"message": "Updated event successfully"})
+}
+
 func DeleteEvent(c *gin.Context) {
 	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
 	if err != nil {

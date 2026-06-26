@@ -30,9 +30,11 @@ var (
 	ErrInstitutionFetchFailed  = errors.New("Error while fetching institution")
 	ErrInstitutionCreateFailed = errors.New("Error while creating institution")
 	ErrInstitutionDeleteFailed = errors.New("Error while deleting institution")
+	ErrInstitutionUpdateFailed = errors.New("Error while updating institution")
 
 	ErrEventNotFound     = errors.New("Event not found")
 	ErrEventListFailed   = errors.New("Error while listing events")
 	ErrCreateEventFailed = errors.New("Error while creating event")
 	ErrDeleteEventFailed = errors.New("Error while deleting event")
+	ErrUpdateEventFailed = errors.New("Error while updating event")
 )

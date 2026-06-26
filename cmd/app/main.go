@@ -41,6 +41,8 @@ func main() {
 	router.PATCH("/users/:id", middleware.Authentication, middleware.Authorization("admin"), controllers.UpdateUser)
 	router.PATCH("/books/:id", middleware.Authentication, middleware.Authorization("admin", "teacher"), controllers.UpdateBook)
 	router.PATCH("/loans/:id", middleware.Authentication, controllers.ReturnBook)
+	router.PATCH("/institutions/:id", middleware.Authentication, middleware.Authorization("admin"), controllers.UpdateInstitution)
+	router.PATCH("/events/:id", middleware.Authentication, middleware.Authorization("admin", "teacher"), controllers.UpdateEvent)
 	router.DELETE("/users/:id", middleware.Authentication, middleware.Authorization("admin"), controllers.DeleteUser)
 	router.DELETE("/books/:id", middleware.Authentication, middleware.Authorization("admin"), controllers.DeleteBook)
 	router.DELETE("/loans/:id", middleware.Authentication, middleware.Authorization("admin"), controllers.DeleteLoan)

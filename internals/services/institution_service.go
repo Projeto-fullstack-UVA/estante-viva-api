@@ -52,6 +52,21 @@ func CreateInstitution(ctx context.Context, req institutionDto.CreateInstitution
 	return nil
 }
 
+func UpdateInstitution(ctx context.Context, id int64, req institutionDto.UpdateInstitutionRequest) error {
+	affected, err := repositories.UpdateInstitution(ctx, id, req.ToModel())
+	if err != nil {
+		log.Println("Error while updating institution in the database: ", err)
+		return ErrInstitutionUpdateFailed
+	}
+	if affected == 0 {
+		log.Println("No institution found to update with the provided id")
+		return ErrInstitutionNotFound
+	}
+
+	log.Println("Institution updated successfully")
+	return nil
+}
+
 func DeleteInstitution(ctx context.Context, id int64) error {
 	affected, err := repositories.DeleteInstitution(ctx, id)
 	if err != nil {

@@ -59,6 +59,21 @@ func CreateEvent(ctx context.Context, event entities.Event) (int64, error) {
 	return result.RowsAffected(), nil
 }
 
+func UpdateEvent(ctx context.Context, id int64, event entities.Event) (int64, error) {
+	result, err := Pool.Exec(ctx,
+		`UPDATE events SET name = COALESCE(NULLIF($1, ''), name),
+		 description = COALESCE(NULLIF($2, ''), description),
+		 date = COALESCE(NULLIF($3, '0001-01-01'::timestamp), date),
+		 location = COALESCE(NULLIF($4, ''), location),
+		 institution_id = COALESCE(NULLIF($5, 0), institution_id)
+		 WHERE id = $6`,
+		event.Name, event.Description, event.Date, event.Location, event.InstitutionId, id)
+	if err != nil {
+		return 0, err
+	}
+	return result.RowsAffected(), nil
+}
+
 func DeleteEvent(ctx context.Context, id int64) (int64, error) {
 	result, err := Pool.Exec(ctx,
 		`DELETE FROM events WHERE id = $1`, id)
