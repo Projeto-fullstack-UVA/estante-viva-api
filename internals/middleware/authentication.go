@@ -37,11 +37,11 @@ func Authentication(c *gin.Context) {
 }
 
 func GetCurrentUserID(c *gin.Context) (int64, bool) {
-	v, ok := c.Get("user_id")
-	if !ok {
+	userID, exists := c.Get("user_id")
+	if !exists {
 		return 0, false
 	}
-	switch id := v.(type) {
+	switch id := userID.(type) {
 	case float64:
 		return int64(id), true
 	case int64:

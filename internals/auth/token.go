@@ -6,7 +6,7 @@ import (
 
 	"errors"
 
-	environment "github.com/Projeto-fullstack-UVA/estante-viva-api/internals"
+	environment "github.com/Projeto-fullstack-UVA/estante-viva-api/internals/config"
 	"github.com/golang-jwt/jwt/v5"
 )
 

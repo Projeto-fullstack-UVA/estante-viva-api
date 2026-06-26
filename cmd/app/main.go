@@ -2,48 +2,24 @@ package main
 
 import (
 	"log"
-	"net/http"
-	"slices"
 
-	environment "github.com/Projeto-fullstack-UVA/estante-viva-api/internals"
+	config "github.com/Projeto-fullstack-UVA/estante-viva-api/internals/config"
 	"github.com/Projeto-fullstack-UVA/estante-viva-api/internals/controllers"
 	"github.com/Projeto-fullstack-UVA/estante-viva-api/internals/middleware"
 	"github.com/Projeto-fullstack-UVA/estante-viva-api/internals/repositories"
 	"github.com/gin-gonic/gin"
 )
 
-func cors() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		origin := c.GetHeader("Origin")
-		allowOrigin := environment.AllowedOrigins[0]
-		if origin != "" && slices.Contains(environment.AllowedOrigins, origin) {
-			allowOrigin = origin
-		}
-
-		c.Header("Access-Control-Allow-Origin", allowOrigin)
-		c.Header("Access-Control-Allow-Methods", "GET, POST, PATCH, DELETE, OPTIONS")
-		c.Header("Access-Control-Allow-Headers", "Content-Type, Authorization")
-		c.Header("Vary", "Origin")
-
-		if c.Request.Method == http.MethodOptions {
-			c.AbortWithStatus(http.StatusNoContent)
-			return
-		}
-
-		c.Next()
-	}
-}
-
 func main() {
-	environment.LoadEnvironmentVariables()
-	if err := repositories.Init(environment.DatabaseURL); err != nil {
+	config.LoadEnvironmentVariables()
+	if err := repositories.Init(config.DatabaseURL); err != nil {
 		log.Fatalf("Failed to connect to database: %v", err)
 	}
 
 	log.Println("Database connection established with success")
 
 	router := gin.New()
-	router.Use(cors())
+	router.Use(config.Cors())
 
 	router.GET("/me", middleware.Authentication, controllers.GetMe)
 	router.GET("/users", middleware.Authentication, middleware.Authorization("admin"), controllers.ListUsers)
@@ -71,7 +47,7 @@ func main() {
 	router.DELETE("/institutions/:id", middleware.Authentication, middleware.Authorization("admin"), controllers.DeleteInstitution)
 	router.DELETE("/events/:id", middleware.Authentication, middleware.Authorization("admin", "teacher"), controllers.DeleteEvent)
 
-	if err := router.Run(environment.Port); err != nil {
+	if err := router.Run(config.Port); err != nil {
 		log.Fatalln(err)
 	}
 }
