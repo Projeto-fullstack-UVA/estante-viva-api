@@ -18,7 +18,7 @@ func main() {
 
 	log.Println("Database connection established with success")
 
-	router := gin.New()
+	router := gin.Default()
 	router.Use(config.Cors())
 
 	router.GET("/me", middleware.Authentication, controllers.GetMe)
