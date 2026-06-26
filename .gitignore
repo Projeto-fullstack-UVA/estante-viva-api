@@ -1,3 +1,4 @@
 .env
 seeds
 .dockerignore
+.env.local

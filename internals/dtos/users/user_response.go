@@ -1,16 +1,13 @@
 package users
 
 import (
-	"time"
-
 	"github.com/Projeto-fullstack-UVA/estante-viva-api/internals/auth"
 	"github.com/Projeto-fullstack-UVA/estante-viva-api/internals/entities"
 )
 
 type RegisterUserResponse struct {
-	ID        int64     `json:"id"`
-	CreatedAt time.Time `json:"created_at"`
-	Token     string    `json:"token"`
+	ID    int64  `json:"id"`
+	Token string `json:"token"`
 }
 
 type LoginResponse struct {
@@ -19,22 +16,20 @@ type LoginResponse struct {
 }
 
 type UserResponse struct {
-	ID            int64      `json:"id"`
-	Name          string     `json:"name"`
-	Email         string     `json:"email"`
-	Address       string     `json:"address"`
-	Document      string     `json:"document"`
-	Cellphone     string     `json:"cellphone"`
-	Role          string     `json:"role"`
-	InstitutionID *int64     `json:"institution_id"`
-	Score         int16      `json:"score"`
-	CreatedAt     *time.Time `json:"created_at"`
+	ID            int64     `json:"id"`
+	Name          string    `json:"name"`
+	Email         string    `json:"email"`
+	Address       string    `json:"address"`
+	Document      string    `json:"document"`
+	Cellphone     string    `json:"cellphone"`
+	Role          string    `json:"role"`
+	InstitutionID *int64    `json:"institution_id"`
+	Score         int16     `json:"score"`
 }
 
 func NewRegisterUserResponse(u entities.User) RegisterUserResponse {
 	return RegisterUserResponse{
-		ID:        u.ID,
-		CreatedAt: *u.CreatedAt,
+		ID: u.ID,
 	}
 }
 
@@ -51,7 +46,6 @@ func NewListUserResponse(list []entities.User) []UserResponse {
 			Role:          u.Role,
 			InstitutionID: u.InstitutionID,
 			Score:         u.Score,
-			CreatedAt:     u.CreatedAt,
 		})
 	}
 	return out
@@ -80,7 +74,6 @@ func NewUserResponse(u entities.User) UserResponse {
 		Role:          u.Role,
 		InstitutionID: u.InstitutionID,
 		Score:         u.Score,
-		CreatedAt:     u.CreatedAt,
 	}
 }
 

@@ -22,7 +22,7 @@ real spots in the codebase so they can be picked up directly.
 
 ## Security & auth
 
-- [ ] **Centralize the JWT secret.** `middleware/authentication.go` reads
+- [x] **Centralize the JWT secret.** `middleware/authentication.go` reads
   `os.Getenv("JWT_SECRET_KEY")` directly on every request instead of using the
   `environment` package that the rest of the app loads from. Use
   `environment.JwtSecretKey` for one source of truth.
