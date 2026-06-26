@@ -46,15 +46,17 @@ func Register(ctx context.Context, req userdto.CreateUserRequest) (userdto.Regis
 	}
 	user.Password = hashed
 
-	affected, err := repositories.CreateUser(ctx, user)
+	userID, err := repositories.CreateUser(ctx, user)
 	if err != nil {
 		log.Println("Failed to create user in the database: ", err)
 		return userdto.RegisterUserResponse{}, ErrUserCreateFailed
 	}
-	if affected == 0 {
+	if userID == 0 {
 		log.Println("Failed to create user in the database")
 		return userdto.RegisterUserResponse{}, ErrUserCreateFailed
 	}
+	user.ID = userID
+
 	token, err := auth.GenerateToken(&user.ID, &user.Role)
 	if err != nil {
 		log.Println("Failed to generate jwt token: ", err.Error())

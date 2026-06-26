@@ -68,11 +68,6 @@ func CreateBook(ctx context.Context, book entities.Book) (int64, error) {
 	return tag.RowsAffected(), nil
 }
 
-func UpdateBookStatus(ctx context.Context, id int64, status string) error {
-	_, err := Pool.Exec(ctx, `UPDATE books SET status = $1 WHERE id = $2`, status, id)
-	return err
-}
-
 func UpdateBook(ctx context.Context, id int64, book entities.Book) (int64, error) {
 	var edition *string
 	if book.Edition != "" {

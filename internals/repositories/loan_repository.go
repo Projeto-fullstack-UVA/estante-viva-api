@@ -10,6 +10,13 @@ import (
 	"github.com/jackc/pgx/v5"
 )
 
+// Repository-level sentinel errors so callers can map them to the right
+// response without the repositories package depending on services.
+var (
+	ErrLoanNotFound        = errors.New("loan not found")
+	ErrLoanAlreadyReturned = errors.New("loan already returned")
+)
+
 const loanSelect = `SELECT l.id, l.user_id, l.book_id, l.return_date, l.returned_at,
 	b.title AS book_title, b.author AS book_author
 	FROM loans l
@@ -109,19 +116,111 @@ func CreateLoan(ctx context.Context, userID, bookID int64, returnDate time.Time)
 	return &id, nil
 }
 
-func ReturnLoan(ctx context.Context, id int64) (int64, error) {
-	tag, err := Pool.Exec(ctx,
-		`UPDATE loans SET returned_at = $1 WHERE id = $2`, time.Now(), id)
+func ReturnLoan(ctx context.Context, loanID int64) (*int64, error) {
+	var l entities.Loan
+
+	log.Printf("Beginning transaction to return book...")
+	tx, err := Pool.BeginTx(ctx, pgx.TxOptions{})
 	if err != nil {
-		return 0, err
+		log.Printf("Failed to begin transaction: %v", err)
+		return nil, err
 	}
-	return tag.RowsAffected(), nil
+	log.Printf("Transaction started")
+
+	defer tx.Rollback(ctx)
+
+	log.Printf("Getting loan by id %v...", loanID)
+	err = tx.QueryRow(ctx,
+		`SELECT id, book_id, returned_at FROM loans WHERE id = $1`, loanID).Scan(&l.ID, &l.BookID, &l.ReturnedAt)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			log.Printf("Loan with the id %v was not found. Aborting transaction.", loanID)
+			return nil, ErrLoanNotFound
+		}
+		log.Printf("Failed to get loan: %v. Aborting transaction.", err)
+		return nil, err
+	}
+	if l.ReturnedAt != nil {
+		log.Printf("This loan was already finished, the book was returned at %v. Aborting transaction", l.ReturnedAt)
+		return nil, ErrLoanAlreadyReturned
+	}
+
+	log.Printf("Updating loan's returned date...")
+	_, err = tx.Exec(ctx,
+		`UPDATE loans SET returned_at = $1 WHERE id = $2`, time.Now(), l.ID)
+	if err != nil {
+		log.Printf("Error while updating loan's returned date: %v", err)
+		return nil, err
+	}
+	log.Printf("Updated loan's returned date successfully")
+
+	log.Printf("Updating book's status'...")
+	_, err = tx.Exec(ctx, `UPDATE books SET status = $1 WHERE id = $2`, "available", l.BookID)
+	if err != nil {
+		log.Printf("Failed to update book's status: %v \nAborting transaction.", err)
+		return nil, err
+	}
+	log.Printf("Updated book's status' successfully.")
+
+	log.Printf("Committing transaction...")
+	if err := tx.Commit(ctx); err != nil {
+		log.Printf("Failed to commit transaction: %v", err)
+		return nil, err
+	}
+	log.Println("Committed transaction with success")
+
+	log.Printf("The book was returned successfully")
+	return &l.ID, nil
 }
 
 func DeleteLoan(ctx context.Context, id int64) (int64, error) {
-	tag, err := Pool.Exec(ctx, `DELETE FROM loans WHERE id = $1`, id)
+	var l entities.Loan
+
+	log.Printf("Beginning transaction to delete loan...")
+	tx, err := Pool.BeginTx(ctx, pgx.TxOptions{})
 	if err != nil {
+		log.Printf("Failed to begin transaction: %v", err)
 		return 0, err
 	}
+	log.Printf("Transaction started")
+
+	defer tx.Rollback(ctx)
+
+	log.Printf("Getting loan by id %v...", id)
+	err = tx.QueryRow(ctx,
+		`SELECT id, book_id, returned_at FROM loans WHERE id = $1`, id).Scan(&l.ID, &l.BookID, &l.ReturnedAt)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			log.Printf("Loan with the id %v was not found. Aborting transaction.", id)
+			return 0, ErrLoanNotFound
+		}
+		log.Printf("Failed to get loan: %v. Aborting transaction.", err)
+		return 0, err
+	}
+
+	log.Printf("Deleting loan's record...")
+	tag, err := tx.Exec(ctx, `DELETE FROM loans WHERE id = $1`, id)
+	if err != nil {
+		log.Printf("Failed to delete loan: %v", err)
+		return 0, err
+	}
+
+	// Release the book if the loan was still active so it isn't stuck as "lent".
+	if l.ReturnedAt == nil {
+		log.Printf("Loan was active, releasing book %v...", l.BookID)
+		if _, err := tx.Exec(ctx,
+			`UPDATE books SET status = $1 WHERE id = $2`, "available", l.BookID); err != nil {
+			log.Printf("Failed to release book: %v \nAborting transaction.", err)
+			return 0, err
+		}
+	}
+
+	log.Printf("Committing transaction...")
+	if err := tx.Commit(ctx); err != nil {
+		log.Printf("Failed to commit transaction: %v", err)
+		return 0, err
+	}
+	log.Printf("Committed transaction with success")
+
 	return tag.RowsAffected(), nil
 }
