@@ -79,16 +79,17 @@ func GetUserByEmail(ctx context.Context, email string) (*entities.User, error) {
 }
 
 func CreateUser(ctx context.Context, user entities.User) (int64, error) {
-	tag, err := Pool.Exec(ctx,
+	var userID int64
+	err := Pool.QueryRow(ctx,
 		`INSERT INTO users (name, email, password, address, document, cellphone, role, institution_id, score, created_at, birth_date)
-		 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`,
+		 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING id`,
 		user.Name, user.Email, user.Password, user.Address, user.Document,
 		user.Cellphone, user.Role, user.InstitutionID, user.Score, time.Now(), user.BirthDate,
-	)
+	).Scan(&userID)
 	if err != nil {
 		return 0, err
 	}
-	return tag.RowsAffected(), nil
+	return userID, nil
 }
 
 func UpdateUserPassword(ctx context.Context, id int64, password string) error {
